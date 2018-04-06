@@ -42,6 +42,8 @@ let
     };
   };
 
+  configFile = pkgs.writeText "docker-registry-config.yml" (builtins.toJSON (registryConfig // cfg.extraConfig));
+
 in {
   options.services.dockerRegistry = {
     enable = mkEnableOption "Docker Registry";
@@ -95,6 +97,24 @@ in {
       default = {};
       type = types.attrsOf types.str;
     };
+
+    enableGarbageCollect = mkOption {
+      description = "Enable run GarbageCollect automatic every given time.";
+      default = false;
+      type = types.bool;
+    };
+
+    garbageCollectDates = mkOption {
+      default = "daily";
+        type = types.str;
+        description = ''
+          Specification (in the format described by
+          <citerefentry><refentrytitle>systemd.time</refentrytitle>
+          <manvolnum>7</manvolnum></citerefentry>) of the time at
+          which the garbage collect will occur.
+        ''
+      };
+    };
   };
 
   config = mkIf cfg.enable {
@@ -102,9 +122,7 @@ in {
       description = "Docker Container Registry";
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
-      script = let
-        configFile = pkgs.writeText "docker-registry-config.yml" (builtins.toJSON (registryConfig // cfg.extraConfig));
-      in ''
+      script = ''
         ${pkgs.docker-distribution}/bin/registry serve ${configFile}
       '';
 
@@ -112,6 +130,22 @@ in {
         User = "docker-registry";
         WorkingDirectory = cfg.storagePath;
       };
+    };
+
+    systemd.services.docker-registry-garbage-collect = {
+      description = "Run Garbage Collection for docker registry";
+
+      restartIfChange = false;
+      unitConfig.X-StopOnRemoval = false;
+
+      serviceConfig.Type = "oneshot";
+
+      script = ''
+        ${pkgs.docker-distribution}/bin/registry garbage-collect ${configFile}
+        ${lib.optionalString enableRedisCache '${pkgs.systemd}/bin/systemctl restart docker-registry'}
+      '';
+
+      startAt = optional cfg.enableGarbageCollect cfg.garbageCollectDates;
     };
 
     users.extraUsers.docker-registry = {
