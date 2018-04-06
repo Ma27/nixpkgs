@@ -43,7 +43,15 @@ import ./make-test.nix ({ pkgs, ...} : {
     $client2->succeed("docker images | grep scratch");
 
     $client2->succeed(
-      'curl -fsS -X DELETE registry:8080/v2/scratch/manifests/$(curl registry:8080/v2/scratch/manifests/latest | jq ".fsLayers[0].blobSum" | sed -e \'s/"//g\')'
+      'curl -fsS -X DELETE registry:8080/v2/scratch/manifests/$(curl -fsS -I -H"Accept: application/vnd.docker.distribution.manifest.v2+json" registry:8080/v2/scratch/manifests/latest | grep Docker-Content | sed -e\'Docker-Content-Digest: //\' | tr -d \'\r\')'
     );
+
+    $registry->succeed("systemctl start docker-registry-garbage-collect");
+    $registry->waitForUnit("docker-registry.service");
+
+    $registry->fail("ls store/docker/registry/v2/blobs/sha256/**/data");
+
+    $client1->succeed("docker push registry:8080/scratch");
+    $registry->succeed("ls store/docker/registry/v2/blobs/sha256/**/data");
   '';
 })
