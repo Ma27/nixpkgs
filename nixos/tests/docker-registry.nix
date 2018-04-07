@@ -49,9 +49,9 @@ import ./make-test.nix ({ pkgs, ...} : {
     $registry->succeed("systemctl start docker-registry-garbage-collect");
     $registry->waitForUnit("docker-registry.service");
 
-    $registry->fail("ls store/docker/registry/v2/blobs/sha256/**/data");
+    $registry->fail("ls /var/lib/registry/docker/registry/v2/blobs/sha256/**/data");
 
     $client1->succeed("docker push registry:8080/scratch");
-    $registry->succeed("ls store/docker/registry/v2/blobs/sha256/**/data");
+    $registry->succeed("ls /var/lib/registry/docker/registry/v2/blobs/sha256/**/data");
   '';
 })
