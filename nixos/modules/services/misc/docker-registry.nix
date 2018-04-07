@@ -72,11 +72,7 @@ in {
       description = "Enable delete for manifests and blobs.";
     };
 
-    enableRedisCache = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable redis as blob cache instade of inmemory.";
-    };
+    enableRedisCache = mkEnableOption "redis as blob cache";
 
     redisUrl = mkOption {
       type = types.str;
@@ -98,11 +94,7 @@ in {
       type = types.attrsOf types.str;
     };
 
-    enableGarbageCollect = mkOption {
-      description = "Enable run GarbageCollect automatic every given time.";
-      default = false;
-      type = types.bool;
-    };
+    enableGarbageCollect = mkEnableOption "garbage collect";
 
     garbageCollectDates = mkOption {
       default = "daily";
@@ -113,7 +105,6 @@ in {
           <manvolnum>7</manvolnum></citerefentry>) of the time at
           which the garbage collect will occur.
         ''
-      };
     };
   };
 
@@ -142,7 +133,7 @@ in {
 
       script = ''
         ${pkgs.docker-distribution}/bin/registry garbage-collect ${configFile}
-        ${lib.optionalString enableRedisCache '${pkgs.systemd}/bin/systemctl restart docker-registry'}
+        ${lib.optionalString enableRedisCache "${pkgs.systemd}/bin/systemctl restart docker-registry"}
       '';
 
       startAt = optional cfg.enableGarbageCollect cfg.garbageCollectDates;
