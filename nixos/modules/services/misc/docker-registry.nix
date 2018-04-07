@@ -126,14 +126,14 @@ in {
     systemd.services.docker-registry-garbage-collect = {
       description = "Run Garbage Collection for docker registry";
 
-      restartIfChange = false;
+      restartIfChanged = false;
       unitConfig.X-StopOnRemoval = false;
 
       serviceConfig.Type = "oneshot";
 
       script = ''
         ${pkgs.docker-distribution}/bin/registry garbage-collect ${configFile}
-        ${lib.optionalString enableRedisCache "${pkgs.systemd}/bin/systemctl restart docker-registry"}
+        ${optionalString cfg.enableRedisCache "${pkgs.systemd}/bin/systemctl restart docker-registry"}
       '';
 
       startAt = optional cfg.enableGarbageCollect cfg.garbageCollectDates;

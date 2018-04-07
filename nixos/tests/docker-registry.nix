@@ -12,6 +12,7 @@ import ./make-test.nix ({ pkgs, ...} : {
       services.dockerRegistry.enableDelete = true;
       services.dockerRegistry.port = 8080;
       services.dockerRegistry.listenAddress = "0.0.0.0";
+      services.dockerRegistry.enableGarbageCollect = true;
       networking.firewall.allowedTCPPorts = [ 8080 ];
     };
 
@@ -23,7 +24,6 @@ import ./make-test.nix ({ pkgs, ...} : {
     client2 = { config, pkgs, ...}: {
       virtualisation.docker.enable = true;
       virtualisation.docker.extraOptions = "--insecure-registry registry:8080";
-      environment.systemPackages = [ pkgs.jq ];
     };
   };
 
@@ -31,7 +31,7 @@ import ./make-test.nix ({ pkgs, ...} : {
     $client1->start();
     $client1->waitForUnit("docker.service");
     $client1->succeed("tar cv --files-from /dev/null | docker import - scratch");
-    $client1->succeed("docker tag scratch registry:8080/scratch");
+    $client1->succeed("docker tag scratch registry:8080/scratch:latest");
 
     $registry->start();
     $registry->waitForUnit("docker-registry.service");
@@ -43,7 +43,7 @@ import ./make-test.nix ({ pkgs, ...} : {
     $client2->succeed("docker images | grep scratch");
 
     $client2->succeed(
-      'curl -fsS -X DELETE registry:8080/v2/scratch/manifests/$(curl -fsS -I -H"Accept: application/vnd.docker.distribution.manifest.v2+json" registry:8080/v2/scratch/manifests/latest | grep Docker-Content | sed -e\'Docker-Content-Digest: //\' | tr -d \'\r\')'
+      'curl -fsS -X DELETE registry:8080/v2/scratch/manifests/$(curl -fsS -I -H"Accept: application/vnd.docker.distribution.manifest.v2+json" registry:8080/v2/scratch/manifests/latest | grep docker-content-digest | sed -e \'s/docker-content-digest: //\' | tr -d \'\r\')'
     );
 
     $registry->succeed("systemctl start docker-registry-garbage-collect");
