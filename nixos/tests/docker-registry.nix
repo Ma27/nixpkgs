@@ -50,13 +50,12 @@ import ./make-test.nix ({ pkgs, ...} : {
     $registry->waitForUnit("docker-registry.service");
 
     $registry->fail(
-      'bash -c ls -ld /var/lib/docker-registry/docker/registry/v2/blobs/sha256/*/*/data'
+      'ls -l /var/lib/docker-registry/docker/registry/v2/blobs/sha256/*/*/data'
     );
 
     $client1->succeed("docker push registry:8080/scratch");
-    $registry->execute("ls -l /var/lib/docker-registry/docker/registry/v2/blobs/sha256");
     $registry->succeed(
-      'bash -c ls -ld /var/lib/docker-registry/docker/registry/v2/blobs/sha256/*/*/data'
+      'ls -l /var/lib/docker-registry/docker/registry/v2/blobs/sha256/*/*/data'
     );
   '';
 })

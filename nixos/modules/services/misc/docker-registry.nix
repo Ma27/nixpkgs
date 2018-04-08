@@ -135,8 +135,6 @@ in {
         ${pkgs.systemd}/bin/systemctl stop docker-registry.service
         ${pkgs.docker-distribution}/bin/registry garbage-collect ${configFile}
         ${pkgs.systemd}/bin/systemctl start docker-registry.service
-
-        ls /var/lib/docker-registry/docker/registry/v2/blobs/sha256
       '';
 
       startAt = optional cfg.enableGarbageCollect cfg.garbageCollectDates;
