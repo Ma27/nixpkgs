@@ -132,9 +132,8 @@ in {
       serviceConfig.Type = "oneshot";
 
       script = ''
-        ${pkgs.systemd}/bin/systemctl stop docker-registry.service
         ${pkgs.docker-distribution}/bin/registry garbage-collect ${configFile}
-        ${pkgs.systemd}/bin/systemctl start docker-registry.service
+        ${pkgs.systemd}/bin/systemctl restart docker-registry.service
       '';
 
       startAt = optional cfg.enableGarbageCollect cfg.garbageCollectDates;
