@@ -35,6 +35,7 @@ import ./make-test.nix ({ pkgs, ...} : {
 
     $registry->start();
     $registry->waitForUnit("docker-registry.service");
+    $registry->waitForOpenPort("8080");
     $client1->succeed("docker push registry:8080/scratch");
 
     $client2->start();
@@ -46,7 +47,8 @@ import ./make-test.nix ({ pkgs, ...} : {
       'curl -fsS -X DELETE registry:8080/v2/scratch/manifests/$(curl -fsS -I -H"Accept: application/vnd.docker.distribution.manifest.v2+json" registry:8080/v2/scratch/manifests/latest | grep Docker-Content-Digest | sed -e \'s/Docker-Content-Digest: //\' | tr -d \'\r\')'
     );
 
-    $registry->systemctl("start docker-registry-garbage-collect");
+    $registry->systemctl("start docker-registry-garbage-collect.service");
+    $registry->waitUntilFails("systemctl status docker-registry-garbage-collect.service");
     $registry->waitForUnit("docker-registry.service");
 
     $registry->fail(
