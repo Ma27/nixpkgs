@@ -31,7 +31,7 @@ import ./make-test.nix ({ pkgs, ...} : {
     $client1->start();
     $client1->waitForUnit("docker.service");
     $client1->succeed("tar cv --files-from /dev/null | docker import - scratch");
-    $client1->succeed("docker tag scratch registry:8080/scratch:latest");
+    $client1->succeed("docker tag scratch registry:8080/scratch");
 
     $registry->start();
     $registry->waitForUnit("docker-registry.service");
@@ -43,15 +43,20 @@ import ./make-test.nix ({ pkgs, ...} : {
     $client2->succeed("docker images | grep scratch");
 
     $client2->succeed(
-      'curl -fsS -X DELETE registry:8080/v2/scratch/manifests/$(curl -fsS -I -H"Accept: application/vnd.docker.distribution.manifest.v2+json" registry:8080/v2/scratch/manifests/latest | grep docker-content-digest | sed -e \'s/docker-content-digest: //\' | tr -d \'\r\')'
+      'curl -fsS -X DELETE registry:8080/v2/scratch/manifests/$(curl -fsS -I -H"Accept: application/vnd.docker.distribution.manifest.v2+json" registry:8080/v2/scratch/manifests/latest | grep Docker-Content-Digest | sed -e \'s/Docker-Content-Digest: //\' | tr -d \'\r\')'
     );
 
     $registry->succeed("systemctl start docker-registry-garbage-collect");
     $registry->waitForUnit("docker-registry.service");
 
-    $registry->fail("ls /var/lib/registry/docker/registry/v2/blobs/sha256/**/data");
+    $registry->fail(
+      'bash -c ls -ld /var/lib/docker-registry/docker/registry/v2/blobs/sha256/*/*/data'
+    );
 
     $client1->succeed("docker push registry:8080/scratch");
-    $registry->succeed("ls /var/lib/registry/docker/registry/v2/blobs/sha256/**/data");
+    $registry->execute("ls -l /var/lib/docker-registry/docker/registry/v2/blobs/sha256");
+    $registry->succeed(
+      'bash -c ls -ld /var/lib/docker-registry/docker/registry/v2/blobs/sha256/*/*/data'
+    );
   '';
 })
