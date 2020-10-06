@@ -77,20 +77,35 @@ in rec {
     let
       offlineCache = importOfflineCache yarnNix;
 
-      extraBuildInputs = (lib.flatten (builtins.map (key:
-        pkgConfig.${key}.buildInputs or []
-      ) (builtins.attrNames pkgConfig)));
+      mkBuildExtra = name: { buildInputs ? [], postInstall ? "", ... }: with lib;
+        let
+          uglyTmp = [ "https://registry.yarnpkg.com/color/-/color-3.1.2.tgz#68148e7f85d41ad7649c5fa8c8106f098d229e10" "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b" "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.0.2.tgz#04bc7b83fd845ba785bb6eae25bc857e1ef75681" "https://registry.yarnpkg.com/npmlog/-/npmlog-4.1.2.tgz#08a7f2a8bf734604779a9efa4ad5cc717abb954b" "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.5.tgz#e7e71e425298785ea9d22d4f958dbaccf8bb0e1b" "https://registry.yarnpkg.com/semver/-/semver-7.3.2.tgz#604962b052b81ed0786aae84389ffba70ffd3938" "https://registry.yarnpkg.com/simple-get/-/simple-get-4.0.0.tgz#73fa628278d21de83dadd5512d2cc1f4872bd675" "https://registry.yarnpkg.com/tar-fs/-/tar-fs-2.1.0.tgz#d1cdd121ab465ee0eb9ccde2d35049d3f3daf0d5" "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd" ];
 
-      postInstall = (builtins.map (key:
-        if (pkgConfig.${key} ? postInstall) then
-          ''
-            for f in $(find -L -path '*/node_modules/${key}' -type d); do
-              (cd "$f" && (${pkgConfig.${key}.postInstall}))
-            done
-          ''
-        else
-          ""
-      ) (builtins.attrNames pkgConfig));
+          src' = findFirst (p: head (splitString "__" p.name) == name)
+            null
+            (callPackage yarnNix {}).packages;
+
+          src = if src' == null then throw "ouch" else src'.path;
+
+          # mv $(basename $outp) ${if actual == "detect" then "detect-libc" else if actual == "node" then "node-addon-api" else if actual == "prebuild" then "prebuild-install" else if actual == "simple" then "simple-get" else if actual == "tar" then "tar-fs" else actual}
+        in
+        stdenv.mkDerivation {
+          inherit name src;
+          dontBuild = true;
+          buildInputs = buildInputs ++ [ yarn nodejs git ];
+          installPhase = ''
+            mkdir -p $out/node_modules
+            cp -r . $out
+            cd $out/node_modules
+            ${concatMapStringsSep "\n" (path: ''
+              outp=${builtins.fetchTarball path}
+              cp -r $outp .
+              mv $(basename $outp) $(sed -re 's/-([0-9]+)(.*)$//g' <<< "${baseNameOf path}")
+            '') uglyTmp}
+            cd $out
+            ${pkgConfig.sharp.postInstall}
+          '';
+        };
 
       workspaceJSON = pkgs.writeText
         "${name}-workspace-package.json"
@@ -106,7 +121,7 @@ in rec {
     in stdenv.mkDerivation {
       inherit preBuild postBuild name;
       phases = ["configurePhase" "buildPhase"];
-      buildInputs = [ yarn nodejs git ] ++ extraBuildInputs;
+      buildInputs = [ yarn nodejs git ];
 
       configurePhase = ''
         # Yarn writes cache directories etc to $HOME.
@@ -131,7 +146,11 @@ in rec {
 
         yarn install ${lib.escapeShellArgs yarnFlags}
 
-        ${lib.concatStringsSep "\n" postInstall}
+        ${lib.concatStrings (lib.mapAttrsToList (name: cfg: ''
+          rm -rf node_modules/${name}
+          cp -r ${mkBuildExtra name cfg} node_modules/${name}
+          chmod -R a+w node_modules/${name}/
+        '') pkgConfig)}
 
         mkdir $out
         mv node_modules $out/
