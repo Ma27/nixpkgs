@@ -8,7 +8,6 @@ const { execFileSync } = require('child_process')
 // "shell-quote@git+https://github.com/srghma/node-shell-quote.git#without_unlicenced_jsonify":
 //   version "1.6.0"
 //   resolved "git+https://github.com/srghma/node-shell-quote.git#1234commit"
-//
 // to
 //
 // builtins.fetchGit {
@@ -77,13 +76,12 @@ function fetchLockedDep(builtinFetchGit) {
     }
 
     const [url, sha1OrRev] = resolved.split('#')
+    const [actualName, branch] = nameWithVersion.split('#')
 
     const fileName = urlToName(url)
 
     if (url.startsWith('git+') || url.startsWith("git:")) {
       const rev = sha1OrRev
-
-      const [_, branch] = nameWithVersion.split('#')
 
       const urlForGit = url.replace(/^git\+/, '')
 
@@ -92,14 +90,16 @@ function fetchLockedDep(builtinFetchGit) {
 
     const sha = sha1OrRev
 
-    return `    {
+    return `    (rec {
       name = "${fileName}";
+      resolved = "${url}";
+      npmName = "${actualName}";
       path = fetchurl {
         name = "${fileName}";
-        url  = "${url}";
+        url  = resolved;
         sha1 = "${sha}";
       };
-    }`
+    })`
   }
 }
 

@@ -79,15 +79,40 @@ in rec {
 
       mkBuildExtra = name: { buildInputs ? [], postInstall ? "", ... }: with lib;
         let
-          uglyTmp = [ "https://registry.yarnpkg.com/color/-/color-3.1.2.tgz#68148e7f85d41ad7649c5fa8c8106f098d229e10" "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b" "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.0.2.tgz#04bc7b83fd845ba785bb6eae25bc857e1ef75681" "https://registry.yarnpkg.com/npmlog/-/npmlog-4.1.2.tgz#08a7f2a8bf734604779a9efa4ad5cc717abb954b" "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.5.tgz#e7e71e425298785ea9d22d4f958dbaccf8bb0e1b" "https://registry.yarnpkg.com/semver/-/semver-7.3.2.tgz#604962b052b81ed0786aae84389ffba70ffd3938" "https://registry.yarnpkg.com/simple-get/-/simple-get-4.0.0.tgz#73fa628278d21de83dadd5512d2cc1f4872bd675" "https://registry.yarnpkg.com/tar-fs/-/tar-fs-2.1.0.tgz#d1cdd121ab465ee0eb9ccde2d35049d3f3daf0d5" "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd" ];
+          normalizePackage = p: head (splitString "@" p);
 
-          src' = findFirst (p: head (splitString "__" p.name) == name)
+          yarn2nixPackages = (callPackage yarnNix {}).packages;
+
+          packageJSON = mapAttrsToList (k: v: "${k}@${v}") (builtins.fromJSON (builtins.readFile ("${stdenv.mkDerivation {
+            name = "${name}-package.json";
+            inherit src;
+            buildCommand = ''
+              unpackPhase
+              cd "$sourceRoot"
+              patchPhase
+
+              cat ./package.json > $out
+
+              fixupPhase
+            '';
+          }}"))).dependencies or {};
+
+          deps = foldl (
+            p: d: let
+              d' = normalizePackage d;
+              i' = findFirst (p: normalizePackage p.npmName == d') null yarn2nixPackages;
+              i = if i' == null then throw "ouch ${d}" else {
+                inherit (i') resolved;
+                name = d';
+              };
+            in p ++ [i]
+          ) [] packageJSON;
+
+          src' = findFirst (p: (normalizePackage p.npmName) == name)
             null
-            (callPackage yarnNix {}).packages;
+            yarn2nixPackages;
 
           src = if src' == null then throw "ouch" else src'.path;
-
-          # mv $(basename $outp) ${if actual == "detect" then "detect-libc" else if actual == "node" then "node-addon-api" else if actual == "prebuild" then "prebuild-install" else if actual == "simple" then "simple-get" else if actual == "tar" then "tar-fs" else actual}
         in
         stdenv.mkDerivation {
           inherit name src;
@@ -97,11 +122,11 @@ in rec {
             mkdir -p $out/node_modules
             cp -r . $out
             cd $out/node_modules
-            ${concatMapStringsSep "\n" (path: ''
-              outp=${builtins.fetchTarball path}
+            ${concatMapStringsSep "\n" ({ resolved, name }: ''
+              outp=${builtins.fetchTarball resolved}
               cp -r $outp .
-              mv $(basename $outp) $(sed -re 's/-([0-9]+)(.*)$//g' <<< "${baseNameOf path}")
-            '') uglyTmp}
+              mv $(basename $outp) ${name}
+            '') deps}
             cd $out
             ${pkgConfig.sharp.postInstall}
           '';
