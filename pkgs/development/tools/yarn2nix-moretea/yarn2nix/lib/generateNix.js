@@ -39,19 +39,21 @@ function prefetchgit(url, rev) {
   ).sha256
 }
 
-function fetchgit(fileName, url, rev, branch, builtinFetchGit) {
-  return `    {
+function fetchgit(fileName, url, rev, branch, builtinFetchGit, actualName) {
+  return `    (rec {
     name = "${fileName}";
+    resolved = "${url}";
+    npmName = "${actualName}";
     path =
       let${builtinFetchGit ? `
         repo = builtins.fetchGit {
-          url = "${url}";
+          url = resolved;
           ref = "${branch}";
           rev = "${rev}";
         };
       ` : `
         repo = fetchgit {
-          url = "${url}";
+          url = resolved;
           rev = "${rev}";
           sha256 = "${prefetchgit(url, rev)}";
         };
@@ -61,7 +63,7 @@ function fetchgit(fileName, url, rev, branch, builtinFetchGit) {
           # https://github.com/mafintosh/tar-fs/issues/79
           tar cf $out --mode u+w -C \${repo} .
         '';
-  }`
+  })`
 }
 
 function fetchLockedDep(builtinFetchGit) {
@@ -85,7 +87,7 @@ function fetchLockedDep(builtinFetchGit) {
 
       const urlForGit = url.replace(/^git\+/, '')
 
-      return fetchgit(fileName, urlForGit, rev, branch || 'master', builtinFetchGit)
+      return fetchgit(fileName, urlForGit, rev, branch || 'master', builtinFetchGit, actualName)
     }
 
     const sha = sha1OrRev
