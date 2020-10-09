@@ -58,7 +58,7 @@ const pkgs = R.pipe(
     ...value,
     nameWithVersion: key,
   })),
-  R.uniqBy(R.prop('resolved')),
+  R.uniqBy(R.props(['resolved', 'version'])),
 )(json.object)
 
 const fixedPkgsPromises = R.map(fixPkgAddMissingSha1, pkgs)
@@ -80,8 +80,10 @@ const fixedPkgsPromises = R.map(fixPkgAddMissingSha1, pkgs)
   }
 
   if (!options['--no-nix']) {
+    const result = await generateNix(fixedPkgs, options['--builtin-fetchgit']);
+
     // print to stdout
-    console.log(generateNix(fixedPkgs, options['--builtin-fetchgit']))
+    console.log(result)
   }
 })().catch(error => {
   console.error(error)

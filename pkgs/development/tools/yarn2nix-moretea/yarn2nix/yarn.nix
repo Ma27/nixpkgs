@@ -1,4 +1,4 @@
-{ fetchurl, linkFarm, runCommandNoCC, gnutar }: rec {
+{ fetchurl, fetchgit, linkFarm, runCommandNoCC, gnutar }: rec {
   offline_cache = linkFarm "offline" packages;
   packages = [
     {
@@ -2439,6 +2439,14 @@
         name = "nice_try___nice_try_1.0.5.tgz";
         url  = "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz";
         sha1 = "a3378a7696ce7d223e88fc9b764bd7ef1089e366";
+      };
+    }
+    {
+      name = "node_fetch___node_fetch_2.6.1.tgz";
+      path = fetchurl {
+        name = "node_fetch___node_fetch_2.6.1.tgz";
+        url  = "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz";
+        sha1 = "045bd323631f76ed2e2b55573394416b639a0052";
       };
     }
     {

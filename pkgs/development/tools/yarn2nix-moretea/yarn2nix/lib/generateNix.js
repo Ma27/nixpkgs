@@ -2,6 +2,8 @@ const R = require('ramda')
 
 const urlToName = require('./urlToName')
 const { execFileSync } = require('child_process')
+const fetch = require('node-fetch')
+const fs = require('fs')
 
 // fetchgit transforms
 //
@@ -36,13 +38,21 @@ function prefetchgit(url, rev) {
       stdio: [ "ignore", "pipe", "ignore" ],
       timeout: 60000,
     })
-  ).sha256
+  )
 }
 
 function fetchgit(fileName, url, rev, branch, builtinFetchGit, actualName) {
+  const prefetched = prefetchgit(url, rev)
+  const packageJSON = JSON.parse(fs.readFileSync(`${prefetched.path}/package.json`))
+
+  const transitiveDeps = writeTransitiveDeps(packageJSON.dependencies)
+
+  fullDeps = Object.keys(packageJSON.dependencies).map(name => `${name}@${deps[name]}`)
+
   return `    (rec {
     name = "${fileName}";
     resolved = "${url}";
+    ${transitiveDeps}
     npmName = "${actualName}";
     path =
       let${builtinFetchGit ? `
@@ -55,7 +65,7 @@ function fetchgit(fileName, url, rev, branch, builtinFetchGit, actualName) {
         repo = fetchgit {
           url = resolved;
           rev = "${rev}";
-          sha256 = "${prefetchgit(url, rev)}";
+          sha256 = "${prefetched.sha256}";
         };
       `}in
         runCommandNoCC "${fileName}" { buildInputs = [gnutar]; } ''
@@ -66,9 +76,19 @@ function fetchgit(fileName, url, rev, branch, builtinFetchGit, actualName) {
   })`
 }
 
+function writeTransitiveDeps(dependencies) {
+  const serialized = Object.keys(dependencies).map(name => `"${name}@${dependencies[name]}"`)
+
+  return serialized.length > 0
+    ? `transitiveDeps = [
+        ${serialized.join("\n        ")}
+      ];`
+    : 'transitiveDeps = [];'
+}
+
 function fetchLockedDep(builtinFetchGit) {
-  return function (pkg) {
-    const { nameWithVersion, resolved } = pkg
+  return async function (pkg) {
+    const { nameWithVersion, resolved, version } = pkg
 
     if (!resolved) {
       console.error(
@@ -89,12 +109,19 @@ function fetchLockedDep(builtinFetchGit) {
 
       return fetchgit(fileName, urlForGit, rev, branch || 'master', builtinFetchGit, actualName)
     }
+    const [packageJSON, rest] = url.split('/-/');
+
+    const depsRaw = await fetch(`${packageJSON}/${version}`)
+    const deps = (await depsRaw.json()).dependencies || {}
+
+    const transitiveDeps = writeTransitiveDeps(deps)
 
     const sha = sha1OrRev
 
     return `    (rec {
       name = "${fileName}";
       resolved = "${url}";
+      ${transitiveDeps}
       npmName = "${actualName}";
       path = fetchurl {
         name = "${fileName}";
@@ -112,12 +139,18 @@ const HEAD = `
 `.trim()
 
 // Object -> String
-function generateNix(pkgs, builtinFetchGit) {
-  const nameWithVersionAndPackageNix = R.map(fetchLockedDep(builtinFetchGit), pkgs)
+async function generateNix(pkgs, builtinFetchGit) {
+  const nameWithVersionAndPackageNix = await Promise.all(
+    R.map(async n => {
+      const depExpr = fetchLockedDep(builtinFetchGit)(n)
+
+      return await depExpr
+    }, pkgs)
+  )
 
   const packagesDefinition = R.join(
     '\n',
-    R.values(nameWithVersionAndPackageNix),
+    nameWithVersionAndPackageNix
   )
 
   return R.join('\n', [HEAD, packagesDefinition, '  ];', '}'])

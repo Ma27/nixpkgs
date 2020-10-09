@@ -83,20 +83,6 @@ in rec {
 
           yarn2nixPackages = (callPackage yarnNix {}).packages;
 
-          packageJSON = mapAttrsToList (k: v: "${k}@${v}") (builtins.fromJSON (builtins.readFile ("${stdenv.mkDerivation {
-            name = "${name}-package.json";
-            inherit src;
-            buildCommand = ''
-              unpackPhase
-              cd "$sourceRoot"
-              patchPhase
-
-              cat ./package.json > $out
-
-              fixupPhase
-            '';
-          }}"))).dependencies or {};
-
           deps = foldl (
             p: d: let
               d' = normalizePackage d;
@@ -113,6 +99,7 @@ in rec {
             yarn2nixPackages;
 
           src = if src' == null then throw "ouch" else src'.path;
+          packageJSON = if src' == null then throw "ouch" else src'.transitiveDeps;
         in
         stdenv.mkDerivation {
           inherit name src;
