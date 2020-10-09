@@ -77,29 +77,41 @@ in rec {
     let
       offlineCache = importOfflineCache yarnNix;
 
+      # TODO:
+      # * naming
+      # * parse version rather than `findFirst`
       mkBuildExtra = name: { buildInputs ? [], postInstall ? "", ... }: with lib;
         let
           normalizePackage = p: head (splitString "@" p);
 
           yarn2nixPackages = (callPackage yarnNix {}).packages;
 
+          findYarnPackage = search: findFirst (p: normalizePackage p.npmName == search) null yarn2nixPackages;
+
+          # Fetches the sources of all dependencies of a dependency named `name` that
+          # has a custom `postInstall`-script. This is needed to make sure that those
+          # scripts can be built with all dependencies of `name` in its own derivation.
           deps = foldl (
-            p: d: let
-              d' = normalizePackage d;
-              i' = findFirst (p: normalizePackage p.npmName == d') null yarn2nixPackages;
-              i = if i' == null then throw "ouch ${d}" else {
+            foundTransitiveDeps: toProcess: let
+              d' = normalizePackage toProcess;
+              i' = findYarnPackage d';
+              # TODO semver rules!
+              info = if i' == null then throw "Unable to find dependency entry for ${d'} in yarn.lock" else {
                 inherit (i') resolved;
                 name = d';
               };
-            in p ++ [i]
-          ) [] packageJSON;
+            in foundTransitiveDeps ++ [info]
+          ) [] transitiveDeps;
 
-          src' = findFirst (p: (normalizePackage p.npmName) == name)
-            null
-            yarn2nixPackages;
+          entry' = findYarnPackage name;
 
-          src = if src' == null then throw "ouch" else src'.path;
-          packageJSON = if src' == null then throw "ouch" else src'.transitiveDeps;
+          entry = if entry' != null then entry' else throw ''
+            Cannot find any `yarn.lock` reference to ${name} that is supposed to be
+            built with a custom script!
+          '';
+
+          src = entry.path;
+          inherit (entry) transitiveDeps;
         in
         stdenv.mkDerivation {
           inherit name src;
