@@ -120,11 +120,10 @@ in rec {
           installPhase = ''
             mkdir -p $out/node_modules
             cp -r . $out
-            cd $out/node_modules
-            ${concatMapStringsSep "\n" ({ resolved, name }: ''
-              outp=${builtins.fetchTarball resolved}
-              cp -r $outp .
-              mv $(basename $outp) ${name}
+            ${concatMapStringsSep "\n" ({ resolved, name }: let
+              tarball = "${builtins.fetchTarball resolved}";
+            in ''
+              cp -r ${tarball} $out/node_modules/${name}
             '') deps}
             cd $out
             ${pkgConfig.sharp.postInstall}
