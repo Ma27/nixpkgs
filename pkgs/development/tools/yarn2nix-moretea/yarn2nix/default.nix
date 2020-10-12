@@ -77,41 +77,46 @@ in rec {
     let
       offlineCache = importOfflineCache yarnNix;
 
-      # TODO:
-      # * naming
-      # * parse version rather than `findFirst`
       mkBuildExtra = name: { buildInputs ? [], postInstall ? "", ... }: with lib;
         let
-          normalizePackage = p: head (splitString "@" p);
+          inherit (callPackage yarnNix {}) packages;
+          inherit (entry) transitiveDeps;
 
-          yarn2nixPackages = (callPackage yarnNix {}).packages;
+          normalizePackage = p: let
+            toSplit = if substring 0 1 p == "@" then substring 1 (stringLength p - 1) p else p;
+            norm' = splitString "@" toSplit;
+          in assert length norm' == 2;
+            { name = elemAt norm' 0; constraint = elemAt norm' 1; };
 
-          findYarnPackage = search: findFirst (p: normalizePackage p.npmName == search) null yarn2nixPackages;
+          findYarnPackage = search: version:
+            let
+              equals = p: let
+                info = normalizePackage p.npmName;
+                toSearch = [ info.constraint ]
+                  ++ (map (n: (normalizePackage n).constraint) p.alternates);
+              in info.name == search && (any (n: n == version) toSearch || version == "*");
+              pkg' = findFirst equals null packages;
+            in
+              if pkg' != null then pkg' else throw ''
+                ouch! (${version}, ${search})
+              '';
 
           # Fetches the sources of all dependencies of a dependency named `name` that
           # has a custom `postInstall`-script. This is needed to make sure that those
           # scripts can be built with all dependencies of `name` in its own derivation.
           deps = foldl (
             foundTransitiveDeps: toProcess: let
-              d' = normalizePackage toProcess;
-              i' = findYarnPackage d';
-              # TODO semver rules!
-              info = if i' == null then throw "Unable to find dependency entry for ${d'} in yarn.lock" else {
-                inherit (i') resolved;
-                name = d';
+              pkgInfo = normalizePackage toProcess;
+              info = let intermediate = findYarnPackage pkgInfo.name pkgInfo.constraint; in {
+                inherit (intermediate) resolved;
+                inherit (pkgInfo) name;
               };
             in foundTransitiveDeps ++ [info]
           ) [] transitiveDeps;
 
-          entry' = findYarnPackage name;
-
-          entry = if entry' != null then entry' else throw ''
-            Cannot find any `yarn.lock` reference to ${name} that is supposed to be
-            built with a custom script!
-          '';
+          entry = findYarnPackage name "*";
 
           src = entry.path;
-          inherit (entry) transitiveDeps;
         in
         stdenv.mkDerivation {
           inherit name src;

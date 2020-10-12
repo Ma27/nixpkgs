@@ -57,9 +57,23 @@ const pkgs = R.pipe(
   mapObjIndexedReturnArray((value, key) => ({
     ...value,
     nameWithVersion: key,
+    alternates: [],
   })),
   R.uniqBy(R.props(['resolved', 'version'])),
 )(json.object)
+
+Object.keys(pkgs).forEach(name => {
+  const resolved = pkgs[name].resolved;
+  const name_ = pkgs[name].nameWithVersion;
+  Object.keys(json.object).forEach(resolvedName => {
+    if (name_ == resolvedName) {
+      return;
+    }
+    if (json.object[resolvedName].resolved == resolved) {
+      pkgs[name].alternates.push(resolvedName);
+    }
+  });
+});
 
 const fixedPkgsPromises = R.map(fixPkgAddMissingSha1, pkgs)
 

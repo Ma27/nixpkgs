@@ -77,18 +77,23 @@ function fetchgit(fileName, url, rev, branch, builtinFetchGit, actualName) {
 }
 
 function writeTransitiveDeps(dependencies) {
-  const serialized = Object.keys(dependencies).map(name => `"${name}@${dependencies[name]}"`)
+  return writeNixList(
+    'transitiveDeps',
+    Object.keys(dependencies).map(name => `${name}@${dependencies[name]}`)
+  )
+}
 
-  return serialized.length > 0
-    ? `transitiveDeps = [
-        ${serialized.join("\n        ")}
+function writeNixList(name, values) {
+  return values.length > 0
+    ? `${name} = [
+        ${values.map(n => `"${n}"`).join("\n        ")} 
       ];`
-    : 'transitiveDeps = [];'
+    : `${name} = [];`
 }
 
 function fetchLockedDep(builtinFetchGit) {
   return async function (pkg) {
-    const { nameWithVersion, resolved, version } = pkg
+    const { nameWithVersion, resolved, version, alternates } = pkg
 
     if (!resolved) {
       console.error(
@@ -122,6 +127,7 @@ function fetchLockedDep(builtinFetchGit) {
       name = "${fileName}";
       resolved = "${url}";
       ${transitiveDeps}
+      ${writeNixList("alternates", alternates)}
       npmName = "${actualName}";
       path = fetchurl {
         name = "${fileName}";
