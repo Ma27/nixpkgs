@@ -18487,6 +18487,8 @@ in
     unifi6;
   unifi = unifi6;
 
+  plausible = callPackage ../servers/web-apps/plausible { };
+
   urserver = callPackage ../servers/urserver { };
 
   victoriametrics = callPackage ../servers/nosql/victoriametrics { };
