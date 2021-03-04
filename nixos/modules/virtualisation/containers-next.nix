@@ -131,6 +131,7 @@ let
                 Virtualization = "container";
                 Name = "host0";
               };
+              linkConfig.RequiredForOnline = "no";
               dhcpConfig.UseTimezone = "yes";
               networkConfig = {
                 DHCP = "yes";
@@ -157,6 +158,7 @@ let
           Boot = false;
           Parameters = "${container.config.system.build.toplevel}/init";
           Ephemeral = yesNo config.ephemeral;
+          KillSignal = "SIGRTMIN+3";
         }
         (mkIf (!config.ephemeral) {
           LinkJournal = mkDefault "guest";
