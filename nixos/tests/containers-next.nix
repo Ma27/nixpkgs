@@ -38,6 +38,17 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
   testScript = ''
     start_all()
 
+    server.wait_for_unit("network.target")
+    server.wait_for_unit("machines.target")
+
+    server.wait_until_succeeds("ping -4 container0 -c3")
+    server.wait_until_succeeds("ping -6 container0 -c3")
+
+    server.succeed("machinectl terminate container0")
+    server.succeed("machinectl terminate container1")
+
+    server.sleep(60)
+
     server.shutdown()
   '';
 })
