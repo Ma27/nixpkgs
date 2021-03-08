@@ -25,6 +25,21 @@ let
       };
     '';
 
+  radvd.enable = "" != stringAsChars (x: if x == " " || x == "\n" then "" else x) radvd.config;
+
+  radvd.config = ''
+    ${concatMapStrings
+      (x: mkRadvdSection "veth" x cfg.${x}.network.v6.addrPool)
+      (filter
+        (n: cfg.${n}.network != null && cfg.${n}.zone == null)
+        (attrNames cfg))
+    }
+    ${concatMapStrings
+      (x: mkRadvdSection "zone" x config.nixos.containers.zones.${x}.v6.addrPool)
+      (attrNames config.nixos.containers.zones)
+    }
+  '';
+
   mkMatchCfg = type: name:
     assert elem type [ "veth" "zone" ]; {
       Name = "${ifacePrefix type}-${name}";
@@ -400,19 +415,7 @@ in {
     ]));
 
     services.radvd = {
-      enable = true;
-      config = ''
-        ${concatMapStrings
-          (x: mkRadvdSection "veth" x cfg.${x}.network.v6.addrPool)
-          (filter
-            (n: cfg.${n}.network != null && cfg.${n}.zone == null)
-            (attrNames cfg))
-        }
-        ${concatMapStrings
-          (x: mkRadvdSection "zone" x config.nixos.containers.zones.${x}.v6.addrPool)
-          (attrNames config.nixos.containers.zones)
-        }
-      '';
+      inherit (radvd) config enable;
     };
 
     systemd = {
