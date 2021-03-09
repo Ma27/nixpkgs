@@ -64,22 +64,27 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
       matchConfig.Name = "eth1";
       networkConfig.DHCP = lib.mkForce "yes";
       dhcpConfig.UseDNS = "no";
-      networkConfig.MACVLAN = "mv-eth1";
+      networkConfig.MACVLAN = "mv-eth1-host";
       linkConfig.RequiredForOnline = "no";
       address = lib.mkForce [];
       addresses = lib.mkForce [];
     };
-    systemd.network.networks."20-mv-eth1" = {
-      matchConfig.Name = "mv-eth1";
+    systemd.network.networks."20-mv-eth1-host" = {
+      matchConfig.Name = "mv-eth1-host";
       networkConfig.IPForward = "yes";
       dhcpV4Config.ClientIdentifier = "mac";
       address = lib.mkForce [
         "192.168.2.2/24"
       ];
     };
-    systemd.network.netdevs."20-mv-eth1" = {
+    # Even though it's tempting to name this `mv-eth1`, this will actually break
+    # the ability to restart containers and may lead to very bad race conditions: nspawn
+    # creates macvlan interfaces on the host and moves those into the container. Since
+    # those are named `mv-<physif>` (`mv-eth1` in our case), an EEXIST will be returned
+    # in `nspawn-network.c` (see `setup_macvlans`).
+    systemd.network.netdevs."20-mv-eth1-host" = {
       netdevConfig = {
-        Name = "mv-eth1";
+        Name = "mv-eth1-host";
         Kind = "macvlan";
       };
       extraConfig = ''
@@ -100,6 +105,10 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
           networks."10-mv-eth1" = {
             matchConfig.Name = "mv-eth1";
             address = [ "192.168.2.5/24" ];
+          };
+          netdevs."10-mv-eth1" = {
+            netdevConfig.Name = "mv-eth1";
+            netdevConfig.Kind = "veth";
           };
         };
       };
@@ -306,11 +315,11 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
 
         server.wait_until_succeeds("ping ephemeral -6 -c3 >&2")
 
-        # macvlan.succeed("ping -c3 192.168.2.9 -c3 >&2")
-        # macvlan.succeed("machinectl poweroff ephvlan")
-        # macvlan.wait_until_unit_stops("systemd-nspawn@ephvlan")
-        # macvlan.succeed("machinectl start ephvlan")
-        # macvlan.wait_until_succeeds("ping -c3 192.168.2.9 -c3 >&2")
+        macvlan.succeed("ping -c3 192.168.2.9 -c3 >&2")
+        macvlan.succeed("machinectl poweroff ephvlan")
+        macvlan.wait_until_unit_stops("systemd-nspawn@ephvlan")
+        macvlan.succeed("machinectl start ephvlan")
+        macvlan.wait_until_succeeds("ping -c3 192.168.2.9 -c3 >&2")
 
     with subtest("Public networking"):
         server.fail("ip a | grep publicnet")
