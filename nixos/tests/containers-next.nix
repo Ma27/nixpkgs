@@ -1,6 +1,3 @@
-# FIXME the test is still kinda flaky. However the same approach works fine
-# in my Hetzner playground, so I guess the culprit is hidden somewhere here.
-
 import ./make-test-python.nix ({ pkgs, lib, ... }: {
   name = "container-tests";
   meta = with pkgs.stdenv.lib.maintainers; {
@@ -75,6 +72,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
     systemd.network.networks."20-mv-eth1" = {
       matchConfig.Name = "mv-eth1";
       networkConfig.IPForward = "yes";
+      dhcpV4Config.ClientIdentifier = "mac";
       address = lib.mkForce [
         "192.168.2.2/24"
       ];
@@ -90,6 +88,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
       '';
     };
     systemd.nspawn.vlandemo.networkConfig.MACVLAN = "eth1";
+    systemd.nspawn.ephvlan.networkConfig.MACVLAN = "eth1";
     networking = {
       useNetworkd = true;
       useDHCP = false;
@@ -101,6 +100,19 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
           networks."10-mv-eth1" = {
             matchConfig.Name = "mv-eth1";
             address = [ "192.168.2.5/24" ];
+          };
+        };
+      };
+      instances.ephvlan = {
+        ephemeral = true;
+        config.systemd.network = {
+          networks."10-mv-eth1" = {
+            matchConfig.Name = "mv-eth1";
+            address = [ "192.168.2.9/24" ];
+          };
+          netdevs."10-mv-eth1" = {
+            netdevConfig.Name = "mv-eth1";
+            netdevConfig.Kind = "veth";
           };
         };
       };
@@ -170,6 +182,11 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
         };
       };
       publicnet = {};
+
+      ephemeral = {
+        ephemeral = true;
+        network = {};
+      };
     };
 
     systemd.nspawn.publicnet.networkConfig.VirtualEthernet = "no";
@@ -235,6 +252,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
     macvlan.wait_for_unit("multi-user.target")
 
     server.wait_for_unit("systemd-nspawn@container0")
+    server.wait_for_unit("systemd-nspawn@ephemeral")
     server.wait_for_unit("systemd-networkd-wait-online.service")
 
     with subtest("Static networking"):
@@ -250,6 +268,49 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
 
         client.wait_until_succeeds("ping fd24::2 -c3 >&2")
         client.succeed("curl -sSf 'http://[fd24::2]' | grep -q 'Welcome to nginx'")
+
+    with subtest("Dynamic networking"):
+        # Test IPv4LL, DHCP & SLAAC addrs reachability.
+        server.wait_until_succeeds("ping -6 -c3 container1 >&2")
+
+        server.wait_until_succeeds("ping -4 -c3 container1 >&2")
+
+        server.succeed("machinectl status container1 | grep '   fd' | xargs ping -c3")
+        server.succeed(
+            "machinectl status container1 | grep '192.168' | cut -d: -f2 | xargs ping -c3"
+        )
+
+    with subtest("DNS"):
+        server.succeed("resolvectl query client.lan | grep fd23::1")
+        server.succeed("ping -c3 client.lan >&2")
+        server.succeed(
+            "systemd-run -M container1 --pty --quiet -- /bin/sh --login -c 'resolvectl query client.lan | grep fd23::1' >&2"
+        )
+
+    with subtest("MACVLANs"):
+        macvlan.wait_until_succeeds("ping 192.168.2.2 -c3 >&2")
+        macvlan.wait_until_succeeds("ping 192.168.2.5 -c3 >&2")
+        client.wait_until_succeeds("ping 192.168.2.2 -c3 >&2")
+        client.wait_until_succeeds("ping 192.168.2.5 -c3 >&2")
+
+    with subtest("Ephemeral"):
+        server.wait_until_succeeds("ping ephemeral -4 -c3 >&2")
+        server.wait_until_succeeds("ping ephemeral -6 -c3 >&2")
+        server.fail(
+            "systemd-run -M ephemeral --pty --quiet -- /bin/sh --login -c 'test -e /foo'"
+        )
+
+        server.succeed("machinectl poweroff ephemeral")
+        server.wait_until_unit_stops("systemd-nspawn@ephemeral")
+        server.succeed("machinectl start ephemeral")
+
+        server.wait_until_succeeds("ping ephemeral -6 -c3 >&2")
+
+        # macvlan.succeed("ping -c3 192.168.2.9 -c3 >&2")
+        # macvlan.succeed("machinectl poweroff ephvlan")
+        # macvlan.wait_until_unit_stops("systemd-nspawn@ephvlan")
+        # macvlan.succeed("machinectl start ephvlan")
+        # macvlan.wait_until_succeeds("ping -c3 192.168.2.9 -c3 >&2")
 
     with subtest("Public networking"):
         server.fail("ip a | grep publicnet")
@@ -271,40 +332,16 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
             "systemd-run -M publicnet --pty --quiet -- /bin/sh --login -c 'ping fd23::1 -c3 >&2'"
         )
 
-    with subtest("Dynamic networking"):
-        # Test IPv4LL, DHCP & SLAAC addrs reachability.
-        server.wait_until_succeeds("ping -6 -c3 container1 >&2")
-
-        # FIXME IPv4LL addr is used even though `container1` is part of a zone.
-        # Probably an issue with which addr nspawn passes to nscd.
-        # server.wait_until_succeeds("ping -4 -c3 container1 >&2")
-
-        server.succeed("machinectl status container1 | grep '   fd' | xargs ping -c3")
-        server.succeed(
-            "machinectl status container1 | grep '192.168' | cut -d: -f2 | xargs ping -c3"
-        )
-
-    with subtest("DNS"):
-        server.succeed("resolvectl query client.lan | grep fd23::1")
-        server.succeed("ping -c3 client.lan >&2")
-        server.succeed(
-            "systemd-run -M container1 --pty --quiet -- /bin/sh --login -c 'resolvectl query client.lan | grep fd23::1' >&2"
-        )
-
-    with subtest("MACVLANs"):
-        macvlan.wait_until_succeeds("ping 192.168.2.2 -c3 >&2")
-        macvlan.wait_until_succeeds("ping 192.168.2.5 -c3 >&2")
-        client.wait_until_succeeds("ping 192.168.2.2 -c3 >&2")
-        client.wait_until_succeeds("ping 192.168.2.5 -c3 >&2")
-
     server.succeed("machinectl poweroff container0")
     server.succeed("machinectl poweroff container1")
     server.succeed("machinectl poweroff publicnet")
+    server.succeed("machinectl poweroff ephemeral")
 
     server.wait_until_unit_stops("systemd-nspawn@container0")
     server.wait_until_unit_stops("systemd-nspawn@container1")
 
     macvlan.succeed("machinectl poweroff vlandemo")
+    macvlan.succeed("machinectl poweroff ephvlan")
 
     client.shutdown()
     server.shutdown()

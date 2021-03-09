@@ -47,7 +47,7 @@ let
     };
 
   mkNetworkCfg = dhcp: nat: {
-    LinkLocalAddressing = "yes";
+    LinkLocalAddressing = mkDefault "ipv6";
     DHCPServer = yesNo dhcp;
     IPMasquerade = yesNo nat;
     IPForward = "yes";
@@ -152,7 +152,7 @@ let
                 DHCP = "yes";
                 LLDP = "yes";
                 EmitLLDP = "customer-bridge";
-                LinkLocalAddressing = "yes";
+                LinkLocalAddressing = mkDefault "ipv6";
               };
               address = mkIf (cfg.${name}.network != null) (
                 cfg.${name}.network.v4.static.containerPool
