@@ -13,6 +13,9 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
     virtualisation.vlans = [ 1 2 ];
     boot.consoleLogLevel = 7;
     environment.systemPackages = [ pkgs.tcpdump pkgs.tmux ];
+    networking.firewall.extraCommands = ''
+      ip46tables -A INPUT -i eth1 -j ACCEPT
+    '';
     systemd.network.networks."10-eth1" = {
       matchConfig.Name = "eth1";
       networkConfig = {
@@ -63,6 +66,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
     systemd.network.networks."40-eth1" = {
       matchConfig.Name = "eth1";
       networkConfig.DHCP = lib.mkForce "yes";
+      dhcpConfig.UseDNS = "no";
       networkConfig.MACVLAN = "mv-eth1";
       linkConfig.RequiredForOnline = "no";
       address = lib.mkForce [];
@@ -109,6 +113,29 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
     systemd.services.systemd-networkd.environment.SYSTEMD_LOG_LEVEL = "debug";
     boot.consoleLogLevel = 7;
 
+    # Local authoritative DNS server. Used to confirm how DNS is handled by nspawn by default.
+    services.bind = {
+      enable = true;
+      extraOptions = "empty-zones-enable no;";
+      listenOnIpv6 = [ "fd24::1" ];
+      cacheNetworks = [ "fd24::/64" ];
+      zones = [
+        { name = ".";
+          master = true;
+          file = pkgs.writeText "root.zone" ''
+            $TTL 3600
+            . IN SOA ns.example.org. admin.example.org. ( 1 3h 1h 1w 1d )
+            . IN NS ns.example.org.
+
+            ns.example.org. IN AAAA fd24::1
+            client.lan. IN AAAA fd23::1
+
+            1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.2.d.f.ip6.arpa. 1h IN PTR ns.example.org.
+          '';
+        }
+      ];
+    };
+
     # Several nspawn machines to test different things:
     # * `container0': assign ULA IPv6 address (to demonstrate public addrs) and
     #   let nginx listen on it.
@@ -137,8 +164,9 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
         nixpkgs = ../..;
         zone = "foo";
         config = { pkgs, ... }: {
-          environment.systemPackages = [ pkgs.hello ];
+          environment.systemPackages = [ pkgs.hello pkgs.nmap pkgs.dnsutils ];
           systemd.services.systemd-networkd.environment.SYSTEMD_LOG_LEVEL = "debug";
+          systemd.network.networks."20-host0".networkConfig.DNS = "fd24::1";
         };
       };
       publicnet = {};
@@ -150,6 +178,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
       foo = {};
     };
 
+    systemd.network.networks."20-ve-container1".networkConfig.DNS = "fd24::1";
     systemd.network.networks."10-eth1" = {
       matchConfig.Name = "eth1";
       address = [ "fd24::1/64" ];
@@ -157,6 +186,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
       networkConfig = {
         IPForward = "yes";
         IPv6AcceptRA = "yes";
+        DNS = "fd24::1";
       };
       routes = [
         { routeConfig.Destination = "fd23::1/64"; }
@@ -183,12 +213,12 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
     };
 
     programs.mtr.enable = true;
-    environment.systemPackages = [ pkgs.tcpdump pkgs.tmux ];
+    environment.systemPackages = [ pkgs.tcpdump pkgs.tmux pkgs.dnsutils ];
 
     # Needed to make sure that the DHCPServer of `systemd-networkd' properly works and
     # can assign IPv4 addresses to containers.
     time.timeZone = "Europe/Berlin";
-    networking.firewall.allowedUDPPorts = [ 67 68 546 547 ];
+    networking.firewall.allowedUDPPorts = [ 53 67 68 546 547 ];
   };
 
   testScript = ''
@@ -252,6 +282,13 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
         server.succeed("machinectl status container1 | grep '   fd' | xargs ping -c3")
         server.succeed(
             "machinectl status container1 | grep '192.168' | cut -d: -f2 | xargs ping -c3"
+        )
+
+    with subtest("DNS"):
+        server.succeed("resolvectl query client.lan | grep fd23::1")
+        server.succeed("ping -c3 client.lan >&2")
+        server.succeed(
+            "systemd-run -M container1 --pty --quiet -- /bin/sh --login -c 'resolvectl query client.lan | grep fd23::1' >&2"
         )
 
     with subtest("MACVLANs"):
