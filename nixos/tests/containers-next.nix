@@ -141,7 +141,10 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
           systemd.services.systemd-networkd.environment.SYSTEMD_LOG_LEVEL = "debug";
         };
       };
+      publicnet = {};
     };
+
+    systemd.nspawn.publicnet.networkConfig.VirtualEthernet = "no";
 
     nixos.containers.zones = {
       foo = {};
@@ -218,6 +221,39 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
         client.wait_until_succeeds("ping fd24::2 -c3 >&2")
         client.succeed("curl -sSf 'http://[fd24::2]' | grep -q 'Welcome to nginx'")
 
+    with subtest("Public networking"):
+        server.fail("ip a | grep publicnet")
+
+        # In case of no private ethernet the container inherits the networking
+        # from the host.
+        ipdata = server.succeed(
+            "systemd-run -M publicnet --pty --quiet -- /bin/sh --login -c 'ip --json a show eth1 >&2'"
+        )
+
+        import json
+
+        data = json.loads(ipdata)[0]
+        assert any(
+            x["local"] == "fd24::1" for x in data["addr_info"] if x["family"] == "inet6"
+        )
+
+        server.succeed(
+            "systemd-run -M publicnet --pty --quiet -- /bin/sh --login -c 'ping fd23::1 -c3 >&2'"
+        )
+
+    with subtest("Dynamic networking"):
+        # Test IPv4LL, DHCP & SLAAC addrs reachability.
+        server.wait_until_succeeds("ping -6 -c3 container1 >&2")
+
+        # FIXME IPv4LL addr is used even though `container1` is part of a zone.
+        # Probably an issue with which addr nspawn passes to nscd.
+        # server.wait_until_succeeds("ping -4 -c3 container1 >&2")
+
+        server.succeed("machinectl status container1 | grep '   fd' | xargs ping -c3")
+        server.succeed(
+            "machinectl status container1 | grep '192.168' | cut -d: -f2 | xargs ping -c3"
+        )
+
     with subtest("MACVLANs"):
         macvlan.wait_until_succeeds("ping 192.168.2.2 -c3 >&2")
         macvlan.wait_until_succeeds("ping 192.168.2.5 -c3 >&2")
@@ -226,6 +262,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
 
     server.succeed("machinectl poweroff container0")
     server.succeed("machinectl poweroff container1")
+    server.succeed("machinectl poweroff publicnet")
 
     server.wait_until_unit_stops("systemd-nspawn@container0")
     server.wait_until_unit_stops("systemd-nspawn@container1")
