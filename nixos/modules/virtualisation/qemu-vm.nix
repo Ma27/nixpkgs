@@ -124,6 +124,7 @@ let
       mkdir -p $TMPDIR/xchg
 
       ${if cfg.useBootLoader then ''
+        ${if cfg.persistentBootDisk then "if ! test -e $TMPDIR/disk.img; then" else ""}
         # Create a writable copy/snapshot of the boot disk.
         # A writable boot disk can be booted from automatically.
         ${qemu}/bin/qemu-img create -f qcow2 -b ${bootDisk}/disk.img $TMPDIR/disk.img || exit 1
@@ -137,6 +138,7 @@ let
             chmod 0644 "$NIX_EFI_VARS" || exit 1
           fi
         '' else ""}
+        ${if cfg.persistentBootDisk then "fi" else ""}
       '' else ""}
 
       cd $TMPDIR
@@ -500,6 +502,15 @@ in
             kernel and initial ramdisk, bypassing the boot loader
             altogether.
           '';
+      };
+
+    virtualisation.persistentBootDisk =
+      mkOption {
+        default = false;
+        description = ''
+          If enabled, changes written to <filename>/boot</filename> will be
+          synced back to <filename>$TMPDIR/disk.img</filename>.
+        '';
       };
 
     virtualisation.useEFIBoot =
