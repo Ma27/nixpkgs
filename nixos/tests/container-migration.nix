@@ -179,6 +179,13 @@ in {
         client.wait_until_succeeds("ping -c3 ${containerIP} >&2")
         client.succeed("curl -sSf ${containerIP} | grep -q 'Welcome to nginx'")
 
+        legacy.succeed(
+            "systemd-run -M test2 --pty --quiet -- /bin/sh --login -c 'echo foobar >/root/tmpfile; sleep 1'"
+        )
+        legacy.succeed(
+            "systemd-run -M test2 --pty --quiet -- /bin/sh --login -c 'cat /root/tmpfile | grep foobar'"
+        )
+
     with subtest("Prepare migration"):
         legacy.succeed("machinectl poweroff test1")
         legacy.succeed("machinectl poweroff test2")
@@ -205,6 +212,10 @@ in {
         client.wait_until_succeeds("ping -c3 ${hostIP} >&2")
         client.wait_until_succeeds("ping -c3 ${containerIP} >&2")
         client.succeed("curl -sSf ${containerIP} | grep -q 'Welcome to nginx'")
+
+        legacy.succeed(
+            "systemd-run -M test2 --pty --quiet -- /bin/sh --login -c 'cat /root/tmpfile | grep foobar'"
+        )
 
     legacy.succeed("machinectl poweroff test1")
     legacy.succeed("machinectl poweroff test2")
