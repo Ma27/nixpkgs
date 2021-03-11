@@ -184,6 +184,10 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
         sharedNix = false;
         nixpkgs = ../..;
         zone = "foo";
+        network.v6.addrPool = lib.mkForce [];
+        network.v4.addrPool = lib.mkForce [];
+        network.v4.static.containerPool = [ "10.100.200.10/24" ];
+        network.v4.static.hostAddresses = [ "10.100.200.1/24" ];
         config = { pkgs, ... }: {
           environment.systemPackages = [ pkgs.hello pkgs.nmap pkgs.dnsutils ];
           systemd.services.systemd-networkd.environment.SYSTEMD_LOG_LEVEL = "debug";
@@ -281,12 +285,14 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
     with subtest("Dynamic networking"):
         # Test IPv4LL, DHCP & SLAAC addrs reachability.
         server.wait_until_succeeds("ping -6 -c3 container1 >&2")
+        server.wait_until_succeeds("ping -c3 10.100.200.1 >&2")
+        server.wait_until_succeeds("ping -c3 10.100.200.10 >&2")
 
         server.wait_until_succeeds("ping -4 -c3 container1 >&2")
 
         server.succeed("machinectl status container1 | grep '   fd' | xargs ping -c3")
         server.succeed(
-            "machinectl status container1 | grep '192.168' | cut -d: -f2 | xargs ping -c3"
+            "machinectl status ephemeral | grep '192.168' | cut -d: -f2 | xargs ping -c3"
         )
 
     with subtest("DNS"):
