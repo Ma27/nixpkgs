@@ -468,8 +468,9 @@ in {
             ExecReload = if activation.reloadScript != null
               then "${activation.reloadScript}"
               else "${pkgs.writeShellScriptBin "activate" ''
-                systemd-run --machine ${container} --pty --quiet -- /bin/sh --login -c \
-                  '${images.${container}.container.config.system.build.toplevel}/bin/switch-to-configuration test'
+                pid=$(machinectl show ${container} --value --property Leader)
+                ${pkgs.utillinux}/bin/nsenter -t "$pid" -m -u -i -n -p \
+                  -- '${images.${container}.container.config.system.build.toplevel}/bin/switch-to-configuration test'
               ''}/bin/activate";
           };
         }
