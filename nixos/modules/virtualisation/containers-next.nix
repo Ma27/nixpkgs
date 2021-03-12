@@ -480,7 +480,7 @@ in {
               else "${pkgs.writeShellScriptBin "activate" ''
                 pid=$(machinectl show ${container} --value --property Leader)
                 ${pkgs.utillinux}/bin/nsenter -t "$pid" -m -u -i -n -p \
-                  -- '${images.${container}.container.config.system.build.toplevel}/bin/switch-to-configuration test'
+                  -- ${images.${container}.container.config.system.build.toplevel}/bin/switch-to-configuration test
               ''}/bin/activate";
           };
         }
