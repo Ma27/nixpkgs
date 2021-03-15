@@ -161,10 +161,10 @@ foreach (@upcomingNspawnUnits) {
     $orig =~ s/^$out//;
     if ($orig ~~ @currentNspawnUnits) {
         if (fingerprintUnit($_) ne fingerprintUnit($orig)) {
-            my $info = parseUnit($_);
-            if ($info->{'X-ReloadOnChange'}) {
+            my $info = parseUnit("$out/etc/systemd/system/systemd-nspawn\@$unit.service");
+            if (($info->{'X-ReloadIfChanged'} // "false") eq "true") {
                 $unitsToReload{$unitName} = 1;
-            } elsif ($info->{'X-RestartOnChange'}) {
+            } elsif (($info->{'X-RestartIfChanged'} // "true") ne "false") {
                 $unitsToRestart{$unitName} = 1;
             }
         }

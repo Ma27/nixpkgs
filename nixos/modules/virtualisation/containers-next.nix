@@ -421,6 +421,13 @@ in {
           container `${n}' already uses zone `${inst.zone}'!
         '';
       }
+      { assertion = !inst.sharedNix -> inst.activation.strategy != "reload";
+        message = ''
+          Cannot reload a container with `sharedNix' disabled! As soon as the
+          `BindReadOnly='-options change, a config activation can't be done without a reboot
+          (affected: ${n})!
+        '';
+      }
     ]));
 
     services.radvd = {
