@@ -87,6 +87,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: {
 
     base.execute("machinectl poweroff test")
     base.execute("machinectl poweroff test2")
+    base.sleep(3)
 
     base.shutdown()
   '';
