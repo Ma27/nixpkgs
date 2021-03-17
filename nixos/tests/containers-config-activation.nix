@@ -85,6 +85,16 @@ in {
         useNetworkd = true;
         interfaces.eth0.useDHCP = true;
       };
+      nixos.containers.instances.test4 = {
+        network.v4.static.containerPool = [ "10.231.139.2/24" ];
+        network.v4.static.hostAddresses = [ "10.231.139.1/24" ];
+        activation.strategy = "dynamic";
+      };
+      nixos.containers.instances.test5 = {
+        network.v4.static.containerPool = [ "10.231.140.2/24" ];
+        network.v4.static.hostAddresses = [ "10.231.140.1/24" ];
+        activation.strategy = "reload";
+      };
     };
   };
 
@@ -160,6 +170,8 @@ in {
         base.succeed("ping -c3 10.231.136.2 >&2")
         base.succeed("ping -c3 10.231.137.2 >&2")
         base.succeed("systemd-run -M test3 --pty --quiet -- /bin/sh --login -c 'hello'")
+        base.fail("ping -c3 10.231.139.2 >&2")
+        base.fail("ping -c3 10.231.140.2 >&2")
 
     with subtest("Container removal behavior"):
         out = base.succeed(
@@ -174,10 +186,8 @@ in {
         base.fail("ping -c3 10.231.137.2 >&2")
         base.fail("ping -c3 10.231.138.2 >&2")
 
-    base.execute("machinectl poweroff test")
-    base.execute("machinectl poweroff test2")
-    base.execute("machinectl poweroff test3")
-    base.sleep(3)
+        base.succeed("ping -c3 10.231.139.2 >&2")
+        base.succeed("ping -c3 10.231.140.2 >&2")
 
     base.shutdown()
   '';
