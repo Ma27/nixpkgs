@@ -79,6 +79,9 @@ in {
         environment.systemPackages = [ pkgs.hello ];
       };
     };
+    configchange3 = { lib, ... }: {
+      imports = [ configchange ];
+    };
     stop = { lib, ... }: {
       networking = {
         useDHCP = false;
@@ -101,6 +104,7 @@ in {
   testScript = { nodes, ... }: let
     change = nodes.configchange.config.system.build.toplevel;
     change2 = nodes.configchange2.config.system.build.toplevel;
+    change3 = nodes.configchange2.config.system.build.toplevel;
     stop = nodes.stop.config.system.build.toplevel;
   in ''
     base.start()
@@ -172,6 +176,16 @@ in {
         base.succeed("systemd-run -M test3 --pty --quiet -- /bin/sh --login -c 'hello'")
         base.fail("ping -c3 10.231.139.2 >&2")
         base.fail("ping -c3 10.231.140.2 >&2")
+
+    with subtest("Start stopped container"):
+        base.succeed("machinectl poweroff test3")
+        base.wait_until_unit_stops("systemd-nspawn@test3")
+
+        out = base.succeed(
+            "${change3}/bin/switch-to-configuration test 2>&1 | tee /dev/stderr"
+        )
+
+        base.wait_until_succeeds("ping -c3 10.231.138.2 >&2")
 
     with subtest("Container removal behavior"):
         out = base.succeed(
