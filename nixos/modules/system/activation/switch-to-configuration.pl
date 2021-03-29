@@ -230,7 +230,7 @@ foreach (@upcomingNspawnUnits) {
 }
 
 foreach (@currentNspawnUnits) {
-    unless ("$out$_" ~~ @upcomingNspawnUnits) {
+    unless (-f "$out$_") {
         my $unit = basename($_);
         $unit =~ s/\.nspawn//;
         my $unitName = "systemd-nspawn\@$unit.service";
@@ -347,7 +347,9 @@ while (my ($unit, $state) = each %{$activePrev}) {
                             recordUnit($startListFile, $unit);
                         }
 
-                        $unitsToStop{$unit} = 1;
+                        if (index($unit, "systemd-nspawn@") == -1) {
+                            $unitsToStop{$unit} = 1;
+                        }
                     }
                 }
             }
