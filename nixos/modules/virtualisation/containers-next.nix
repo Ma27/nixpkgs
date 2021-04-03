@@ -248,6 +248,15 @@ in {
       '';
     };
 
+    rendered = mkOption {
+      type = types.attrsOf (types.attrsOf types.unspecified);
+      readOnly = true;
+      description = ''
+        Fully rendered configuration of each container. Helpful to introspect the config
+        from outside.
+      '';
+    };
+
     instances = mkOption {
       default = {};
       type = types.attrsOf (types.submodule {
@@ -448,6 +457,8 @@ in {
     services.radvd = {
       inherit (radvd) config enable;
     };
+
+    nixos.containers.rendered = mapAttrs (const (x: x.container)) images;
 
     systemd = {
       network.networks = mkMerge
