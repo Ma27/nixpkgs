@@ -510,11 +510,11 @@ in {
               # picked up if an override exists and `systemd-nspawn@ldap` exists.
               RestartForceExitStatus = 133;
               Type = "notify";
-              Delegate = "yes";
               TasksMax = 16384;
               WatchdogSec = "3min";
               SuccessExitStatus = 133;
               KillMode = "mixed";
+              Slice = "machine.slice";
               DevicePolicy = "closed";
               DeviceAllow = [
                 "/dev/net/tun rwm"
