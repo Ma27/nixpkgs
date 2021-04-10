@@ -142,6 +142,7 @@ in {
         base.wait_until_succeeds("curl 10.231.136.2 -sSf --connect-timeout 10")
         base.fail("ping -c3 10.231.137.2 -c3")
 
+        base.wait_until_succeeds("ping -c3 10.231.138.2 >&2")
         base.succeed(
             f"systemd-run -M restart --pty --quiet -- /bin/sh --login -c 'test -e /tmp/systemd'"
         )
@@ -156,12 +157,13 @@ in {
             "${change2}/bin/switch-to-configuration test 2>&1 | tee /dev/stderr"
         )
 
+        base.wait_until_succeeds(f"ping -c3 10.231.136.2 >&2")
+
         base.succeed(
             f"systemd-run -M dynamic --pty --quiet -- /bin/sh --login -c 'test -e /tmp/systemd'"
         )
 
         base.wait_until_succeeds("ping -c3 10.231.150.2 >&2")
-        base.wait_until_succeeds("ping -c3 10.231.151.2 >&2")
 
     base.shutdown()
   '';
