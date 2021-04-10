@@ -197,12 +197,12 @@ sub compareNspawnUnits {
                 or $newKey eq 'X-ActivationStrategy';
 
             if (deepCmp($contentsOld->{$oldKey}, $contentsNew->{$newKey}) != 0) {
-                return (1, $contentsNew->{'X-ActivationStrategy'} // "dynamic");
+                return (1, $contentsNew->{'X-ActivationStrategy'}[0] // "dynamic");
             }
         }
     }
 
-    return (0, $contentsNew->{'X-ActivationStrategy'} // "dynamic");
+    return (0, $contentsNew->{'X-ActivationStrategy'}[0] // "dynamic");
 }
 
 my @currentNspawnUnits = glob("/etc/systemd/nspawn/*.nspawn");

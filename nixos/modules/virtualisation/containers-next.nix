@@ -194,6 +194,7 @@ let
           Parameters = "${container.config.system.build.toplevel}/init";
           Ephemeral = yesNo config.ephemeral;
           KillSignal = "SIGRTMIN+3";
+          X-ActivationStrategy = config.activation.strategy;
         }
         (mkIf (!config.ephemeral) {
           LinkJournal = mkDefault "guest";
@@ -502,7 +503,7 @@ in {
           partOf = [ "machines.target" ];
           before = [ "machines.target" ];
 
-          unitConfig.RequiresMountFor = "/var/lib/machines/${container}";
+          #unitConfig.RequiresMountsFor = "/var/lib/machines/${container}";
           serviceConfig = mkMerge [
             {
               # Inherit settings from `systemd-nspawn@.service`.
