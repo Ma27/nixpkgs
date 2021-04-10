@@ -70,14 +70,25 @@ in {
       systemd.nspawn.reload.filesConfig.BindReadOnly = [ "/etc:/tmp" ];
     };
     configchange2 = {
-      # TODO: dynamic, new container, network changes
       imports = [ configchange ];
+      systemd.nspawn.dynamic.filesConfig.BindReadOnly = [ "/etc:/tmp" ];
+      nixos.containers.instances = {
+        new = {
+          network.v4.static.containerPool = [ "10.231.150.2/24" ];
+          network.v4.static.hostAddresses = [ "10.231.150.1/24" ];
+        };
+        restart = {
+          network.v4.static.containerPool = [ "10.231.151.2/24" ];
+          network.v4.static.hostAddresses = [ "10.231.151.1/24" ];
+        };
+      };
     };
   };
   skipLint = true;
 
   testScript = { nodes, ... }: let
     change = nodes.configchange.config.system.build.toplevel;
+    change2 = nodes.configchange2.config.system.build.toplevel;
   in ''
     base.start()
     base.wait_for_unit("network.target")
@@ -139,6 +150,18 @@ in {
         base.fail(
             f"systemd-run -M reload --pty --quiet -- /bin/sh --login -c 'test -e /tmp/systemd'"
         )
+
+    with subtest("More changes"):
+        base.succeed(
+            "${change2}/bin/switch-to-configuration test 2>&1 | tee /dev/stderr"
+        )
+
+        base.succeed(
+            f"systemd-run -M dynamic --pty --quiet -- /bin/sh --login -c 'test -e /tmp/systemd'"
+        )
+
+        base.wait_until_succeeds("ping -c3 10.231.150.2 >&2")
+        base.wait_until_succeeds("ping -c3 10.231.151.2 >&2")
 
     base.shutdown()
   '';
