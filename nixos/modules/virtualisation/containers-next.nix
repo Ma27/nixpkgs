@@ -503,7 +503,7 @@ in {
           partOf = [ "machines.target" ];
           before = [ "machines.target" ];
 
-          #unitConfig.RequiresMountsFor = "/var/lib/machines/${container}";
+          unitConfig.RequiresMountsFor = "/var/lib/machines/${container}";
           serviceConfig = mkMerge [
             {
               # Inherit settings from `systemd-nspawn@.service`.
