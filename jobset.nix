@@ -1,5 +1,5 @@
 let
-  release = import ./release.nix {
+  release = import ./nixos/release.nix {
     supportedSystems = [ "x86_64-linux" ];
   };
 in
