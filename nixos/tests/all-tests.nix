@@ -71,6 +71,9 @@ in
   cloud-init = handleTest ./cloud-init.nix {};
   cockroachdb = handleTestOn ["x86_64-linux"] ./cockroachdb.nix {};
   consul = handleTest ./consul.nix {};
+  containers-next = handleTest ./containers-next.nix {};
+  container-migration = handleTest ./container-migration.nix {};
+  containers-config-activation = handleTest ./containers-config-activation.nix {};
   containers-bridge = handleTest ./containers-bridge.nix {};
   containers-custom-pkgs.nix = handleTest ./containers-custom-pkgs.nix {};
   containers-ephemeral = handleTest ./containers-ephemeral.nix {};
