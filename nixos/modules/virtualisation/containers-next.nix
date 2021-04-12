@@ -284,7 +284,7 @@ in {
           };
 
           nixpkgs = mkOption {
-            default = pkgs.path;
+            default = ../../..;
             type = types.path;
             description = ''
               Path to the `nixpkgs`-checkout or channel to use for the container.
