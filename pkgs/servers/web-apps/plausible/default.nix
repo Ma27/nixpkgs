@@ -50,6 +50,7 @@ beamPackages.buildMix {
 
   postPatch = ''
     sed -ie '/cache_static_manifest/d' config/releases.exs
+    echo 'config :tzdata, :data_dir, "/etc/elixir_tzdata_data"' >> config/releases.exs
   '';
 
   preBuild = ''
