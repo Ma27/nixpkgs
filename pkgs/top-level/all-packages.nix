@@ -13673,6 +13673,8 @@ in
 
   premake = premake4;
 
+  privacyidea = callPackage ../development/python-modules/privacyidea { };
+
   procodile = callPackage ../tools/system/procodile { };
 
   pry = callPackage ../development/tools/pry { };
