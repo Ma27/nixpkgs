@@ -5,7 +5,7 @@
 let
   python3' = python3.override {
     packageOverrides = self: super: {
-      sqlalchemy = self.sqlalchemy_1_3;
+      #sqlalchemy = self.sqlalchemy_1_3;
     };
   };
 in
