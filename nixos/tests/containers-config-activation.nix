@@ -38,7 +38,7 @@ import ./make-test-python.nix ({ pkgs, lib, ... }: let
   };
 in {
   name = "container-tests";
-  meta = with pkgs.stdenv.lib.maintainers; {
+  meta = with pkgs.lib.maintainers; {
     maintainers = [ ma27 ];
   };
 
