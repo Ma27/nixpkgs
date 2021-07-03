@@ -518,6 +518,7 @@ in {
               TasksMax = 16384;
               WatchdogSec = "3min";
               SuccessExitStatus = 133;
+              Delegate = "yes";
               KillMode = "mixed";
               Slice = "machine.slice";
               DevicePolicy = "closed";
