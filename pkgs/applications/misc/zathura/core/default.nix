@@ -15,6 +15,10 @@ stdenv.mkDerivation (finalAttrs: {
     sha256 = "15314m9chmh5jkrd9vk2h2gwcwkcffv2kjcxkd4v3wmckz5sfjy6";
   };
 
+  patches = [
+    ./0001-Fix-remote-link-resolution-in-zathura.patch
+  ];
+
   outputs = [ "bin" "man" "dev" "out" ];
 
   # Flag list:
