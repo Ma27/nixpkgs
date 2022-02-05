@@ -1,0 +1,56 @@
+From 05aec96f09bd71c8e069c7d45178c791c899c045 Mon Sep 17 00:00:00 2001
+From: Maximilian Bosch <maximilian@mbosch.me>
+Date: Sat, 5 Feb 2022 00:06:31 +0100
+Subject: [PATCH] Fix remote-link resolution in zathura
+
+Inside a TeX-document I have a PDF-link to another PDF like
+
+    \href{run:\detokenize{/home/ma27/Documents/Uni/Studium/ILIAS/hm/Hoehere Mathematik 1.pdf}}{HM I}
+
+the link can be easily opened when opening the resulting PDF with e.g.
+`evince(1)`.
+
+However, `zathura(1)` fails to do the same, according to `strace(1)` for
+the following reason:
+
+    [pid 2217327] execve("/nix/store/2wjhxbgzcnn0qqdwqy0m01hw39dxwfmk-zathura-0.4.8-bin/bin/.zathura-wrapped", ["/nix/store/2wjhxbgzcnn0qqdwqy0m01hw39dxwfmk-zathura-0.4.8-bin/bin/zathura", "/home/ma27/Documents/Uni/Studium/Notepad/Aktuell/file:///home/ma27/Documents/Uni/Studium/ILIAS/hm1/Hoehere Mathematik 1.pdf"], 0x1722010 /* 108 vars */) = 0
+
+Please note that `/home/ma27/Documents/Uni/Studium/Notepad/Aktuell` is
+the path of the other document I opened, but not necessarily the working
+directory.
+
+The principle is the same as with 3f2001e6bc6171ab53e1684187bc3407c119e955,
+the `g_spawn_async` now uses the document's directory as `cwd` to open
+the other file and in turn doesn't append the directory to the file-path
+anymore causing the problems I described above.
+
+This should also fix https://git.pwmt.org/pwmt/zathura/-/issues/58
+---
+ zathura/links.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/zathura/links.c b/zathura/links.c
+index 93ceb20..dfc897e 100644
+--- a/zathura/links.c
++++ b/zathura/links.c
+@@ -200,7 +200,7 @@ link_remote(zathura_t* zathura, const char* file)
+ 
+   const char* path = zathura_document_get_path(zathura->document);
+   char* dir        = g_path_get_dirname(path);
+-  char* uri        = g_build_filename(dir, file, NULL);
++  char* uri        = g_build_filename(file, NULL);
+ 
+   char* argv[] = {
+     *(zathura->global.arguments),
+@@ -209,7 +209,7 @@ link_remote(zathura_t* zathura, const char* file)
+   };
+ 
+   GError* error = NULL;
+-  if (g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &error) == FALSE) {
++  if (g_spawn_async(dir, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &error) == FALSE) {
+     girara_error("Failed to execute command: %s", error->message);
+     g_error_free(error);
+   }
+-- 
+2.33.1
+
