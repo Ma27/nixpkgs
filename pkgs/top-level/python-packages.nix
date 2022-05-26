@@ -5427,6 +5427,8 @@ in {
 
   more-itertools = callPackage ../development/python-modules/more-itertools { };
 
+  more-properties = callPackage ../development/python-modules/more-properties { };
+
   moretools = callPackage ../development/python-modules/moretools { };
 
   morphys = callPackage ../development/python-modules/morphys { };
