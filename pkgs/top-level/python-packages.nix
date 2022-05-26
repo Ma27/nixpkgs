@@ -2092,6 +2092,8 @@ in {
 
   dataclasses-json = callPackage ../development/python-modules/dataclasses-json { };
 
+  dataclasses-serialization = callPackage ../development/python-modules/dataclasses-serialization { };
+
   datadiff = callPackage ../development/python-modules/datadiff { };
 
   datadog = callPackage ../development/python-modules/datadog { };
