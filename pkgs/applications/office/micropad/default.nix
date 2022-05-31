@@ -68,10 +68,7 @@ in
     '';
 
     # Do not attempt generating a tarball for micropad again.
-    # note: `doDist = false;` does not work.
-    distPhase = ''
-      true
-    '';
+    doDist = false;
 
     # The desktop item properties should be kept in sync with data from upstream:
     # https://github.com/MicroPad/MicroPad-Electron/blob/master/package.json
