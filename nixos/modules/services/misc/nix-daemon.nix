@@ -730,7 +730,7 @@ in
     # systemd.tmpfiles.packages = [ nixPackage ];
 
     # Can be dropped for Nix > https://github.com/NixOS/nix/pull/6285
-    systemd.tmpfiles.rules = [
+    systemd.tmpfiles.rules = mkIf (!config.boot.isContainer) [
       "d /nix/var/nix/daemon-socket 0755 root root - -"
     ];
 

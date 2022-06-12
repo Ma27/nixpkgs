@@ -21,6 +21,7 @@ use File::Slurp qw(read_file write_file edit_file);
 use JSON::PP;
 use IPC::Cmd;
 use Sys::Syslog qw(:standard :macros);
+use experimental 'smartmatch';
 use Cwd qw(abs_path);
 
 ## no critic(ControlStructures::ProhibitDeepNests)
@@ -243,6 +244,29 @@ sub parse_systemd_ini {
     return;
 }
 
+sub parseNspawn {
+    my ($filename) = @_;
+    my $info = {};
+    parseKeyValuesArray($info, read_file($filename));
+    return $info;
+}
+
+sub parseKeyValuesArray {
+    my $info = shift;
+    foreach my $line (@_) {
+        $line =~ /^([^=]+)=(.*)$/ or next;
+        unless (exists $info->{$1}) {
+            $info->{$1} = ();
+        }
+        push @{$info->{$1}}, $2;
+    }
+}
+
+sub boolIsTrue {
+    my ($s) = @_;
+    return $s eq "yes" || $s eq "true";
+}
+
 # This subroutine takes the path to a systemd configuration file (like a unit configuration),
 # parses it, and returns a hash that contains the contents. The contents of this hash are
 # explained in the `parse_systemd_ini` subroutine. Neither the sections nor the keys inside
@@ -294,7 +318,9 @@ sub record_unit {
 sub unrecord_unit {
     my ($fn, $unit) = @_;
     if ($action ne "dry-activate") {
-        edit_file(sub { s/^$unit\n//msx }, $fn);
+        if (index($unit, "systemd-nspawn@") == -1) {
+            edit_file(sub { s/^$unit\n//msx }, $fn);
+        }
     }
     return;
 }
@@ -500,19 +526,23 @@ sub handle_modified_unit { ## no critic(Subroutines::ProhibitManyArgs, Subroutin
                 # We write this to a file to ensure that the
                 # service gets restarted if we're interrupted.
                 if (!$socket_activated) {
-                    $units_to_start->{$unit} = 1;
-                    if ($units_to_start eq $units_to_restart) {
-                        record_unit($restart_list_file, $unit);
-                    } else {
-                        record_unit($start_list_file, $unit);
+                    if (index($unit, "systemd-nspawn@") == -1) {
+                        $units_to_start->{$unit} = 1;
+                        if ($units_to_start eq $units_to_restart) {
+                            record_unit($restart_list_file, $unit);
+                        } else {
+                            record_unit($start_list_file, $unit);
+                        }
                     }
                 }
 
-                $units_to_stop->{$unit} = 1;
-                # Remove from units to reload so we don't restart and reload
-                if ($units_to_reload->{$unit}) {
-                    delete $units_to_reload->{$unit};
-                    unrecord_unit($reload_list_file, $unit);
+                if (index($unit, "systemd-nspawn@") == -1) {
+                    $units_to_stop->{$unit} = 1;
+                    # Remove from units to reload so we don't restart and reload
+                    if ($units_to_reload->{$unit}) {
+                        delete $units_to_reload->{$unit};
+                        unrecord_unit($reload_list_file, $unit);
+                    }
                 }
             }
         }
@@ -533,6 +563,89 @@ my %units_to_filter; # units not shown
 
 %units_to_reload = map { $_ => 1 }
     split(/\n/msx, read_file($reload_list_file, err_mode => "quiet") // "");
+
+sub deepCmp {
+    my ($a, $b) = @_;
+    if (@$a != @$b) {
+        return 1;
+    }
+    foreach (my $i = 0; $i < @$a; $i++) {
+        if (@$a[$i] ne @$b[$i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+sub compareNspawnUnits {
+    my ($old, $new) = @_;
+    my $contentsOld = parseNspawn($old);
+    my $contentsNew = parseNspawn($new);
+
+    foreach (keys %$contentsOld) {
+        my $oldKey = $_;
+        foreach (keys %$contentsNew) {
+            my $newKey = $_;
+            next if $newKey ne $oldKey
+                or $newKey eq 'Parameters'
+                or $newKey eq 'X-ActivationStrategy';
+
+            if (deepCmp($contentsOld->{$oldKey}, $contentsNew->{$newKey}) != 0) {
+                return (1, $contentsNew->{'X-ActivationStrategy'}[0] // "dynamic");
+            }
+        }
+    }
+
+    return (0, $contentsNew->{'X-ActivationStrategy'}[0] // "dynamic");
+}
+
+my $activeContainersOut = `machinectl list`;
+sub isContainerRunning {
+    my ($name) = @_;
+    if (index($activeContainersOut, $name) != -1) {
+        return 1;
+    }
+    return 0;
+}
+
+my @currentNspawnUnits = glob("/etc/systemd/nspawn/*.nspawn");
+my @upcomingNspawnUnits = glob("$out/etc/systemd/nspawn/*.nspawn");
+sub fingerprintUnit {
+    my ($s) = @_;
+    return abs_path($s) . (-f "${s}.d/overrides.conf" ? " " . abs_path "${s}.d/overrides.conf" : "");
+}
+foreach (@upcomingNspawnUnits) {
+    my $unit = basename($_);
+    $unit =~ s/\.nspawn//;
+    my $unitName = "systemd-nspawn\@$unit.service";
+    my $orig = $_;
+    $orig =~ s/^$out//;
+    if ($orig ~~ @currentNspawnUnits) {
+        if (fingerprintUnit($_) ne fingerprintUnit($orig)) {
+            my ($eq, $strategy) = compareNspawnUnits($orig, $_);
+            if ($strategy ne "none") {
+                if ($strategy ne "restart" and ($eq == 0 or $strategy eq "reload")) {
+                    if (isContainerRunning($unit) == 1) {
+                        $units_to_reload{$unitName} = 1;
+                    }
+                } elsif ($eq == 1) {
+                    $units_to_restart{$unitName} = 1;
+                }
+            }
+        }
+    } else {
+        $units_to_start{$unitName} = 1;
+    }
+}
+
+foreach (@currentNspawnUnits) {
+    unless (-f "$out$_") {
+        my $unit = basename($_);
+        $unit =~ s/\.nspawn//;
+        my $unitName = "systemd-nspawn\@$unit.service";
+        $units_to_stop{$unitName} = 1;
+    }
+}
 
 my $active_cur = get_active_units();
 while (my ($unit, $state) = each(%{$active_cur})) {
@@ -859,8 +972,10 @@ if (scalar(keys(%units_to_reload)) > 0) {
             # Figure out if we need to start the unit
             my %unit_info = parse_unit("$out/etc/systemd/system/$unit");
             if (!(parse_systemd_bool(\%unit_info, "Unit", "RefuseManualStart", 0) || parse_systemd_bool(\%unit_info, "Unit", "X-OnlyManualStart", 0))) {
-                $units_to_start{$unit} = 1;
-                record_unit($start_list_file, $unit);
+                if (index($unit, "systemd-nspawn@") == -1) {
+                    $units_to_start{$unit} = 1;
+                    record_unit($start_list_file, $unit);
+                }
             }
             # Don't reload the unit, reloading would fail
             delete %units_to_reload{$unit};
@@ -872,7 +987,24 @@ if (scalar(keys(%units_to_reload)) > 0) {
 # units.
 if (scalar(keys(%units_to_reload)) > 0) {
     print STDERR "reloading the following units: ", join(", ", sort(keys(%units_to_reload))), "\n";
-    system("$new_systemd/bin/systemctl", "reload", "--", sort(keys(%units_to_reload))) == 0 or $res = 4;
+    my @to_reload = sort(keys %units_to_reload);
+    my (@services, @containers);
+    foreach my $s (@to_reload) {
+        if (index($s, "systemd-nspawn@") == 0) {
+            push @containers, $s;
+        } else {
+            push @services, $s;
+        }
+    }
+
+    # Reloading containers & dbus.service in the same transaction causes
+    # the system to stall for about 1 minute.
+    if (scalar(@services) > 0) {
+        system("@systemd@/bin/systemctl", "reload", "--", @services) == 0 or $res = 4;
+    }
+    if (scalar(@containers) > 0) {
+        system("@systemd@/bin/systemctl", "reload", "--", @containers) == 0 or $res = 4;
+    }
     unlink($reload_list_file);
 }
 
