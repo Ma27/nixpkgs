@@ -12682,6 +12682,8 @@ with pkgs;
 
   sudo = callPackage ../tools/security/sudo { };
 
+  sudo-nspawn = sudo.override { withStaticSudoers = true; };
+
   suidChroot = callPackage ../tools/system/suid-chroot { };
 
   sundtek = callPackage ../misc/drivers/sundtek { };
@@ -39416,6 +39418,8 @@ with pkgs;
   nixos-grub2-theme = callPackage ../data/misc/nixos-artwork/grub2-theme.nix { };
 
   nixos-bgrt-plymouth = callPackage ../data/themes/nixos-bgrt-plymouth { };
+
+  nixos-nspawn = callPackage ../tools/virtualization/nixos-nspawn { };
 
   nixos-container = callPackage ../tools/virtualization/nixos-container { };
 
