@@ -6428,7 +6428,7 @@ with pkgs;
 
   git-latexdiff = callPackage ../tools/typesetting/git-latexdiff { };
 
-  gitea = callPackage ../applications/version-management/gitea { };
+  gitea = callPackage ../applications/version-management/gitea { buildGoPackage = buildGo118Package; };
 
   gokart = callPackage ../development/tools/gokart { };
 
