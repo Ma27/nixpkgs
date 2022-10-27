@@ -4,18 +4,18 @@
 
 let
   pname = "signald";
-  version = "0.18.5";
+  version = "0.23.0";
 
   src = fetchFromGitLab {
     owner = pname;
     repo = pname;
     rev = version;
-    sha256 = "sha256-2cb1pyBOoOlFqJsNKXA0Q9x4wCE4yzzcfrDDtTp7HMk=";
+    sha256 = "sha256-RN0OYjOmVtHKeFkviep952uf3qWuBj8lhcaP1Lk/gDo=";
   };
 
   jre' = jre_minimal.override {
     jdk = jdk17_headless;
-    # from https://gitlab.com/signald/signald/-/blob/0.18.5/build.gradle#L173
+    # from https://gitlab.com/signald/signald/-/blob/0.23.0/build.gradle#L173
     modules = [
       "java.base"
       "java.management"
@@ -54,7 +54,7 @@ let
     outputHashMode = "recursive";
     # Downloaded jars differ by platform
     outputHash = {
-      x86_64-linux = "sha256-q1gzauIL7aKalvPSfiK5IvkNkidCh+6jp5bpwxR+PZ0=";
+      x86_64-linux = "sha256-ANiNDdTuCuDEH5zUPsrVF6Uegdq3zVsMv+uMtYRX0jE=";
       aarch64-linux = "sha256-cM+7MaV0/4yAzobXX9FSdl/ZfLddwySayao96UdDgzk=";
     }.${stdenv.system} or (throw "Unsupported platform");
   };
