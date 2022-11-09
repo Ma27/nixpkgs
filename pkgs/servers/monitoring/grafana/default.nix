@@ -1,6 +1,6 @@
-{ lib, buildGoModule, fetchurl, fetchFromGitHub, nixosTests, tzdata, wire }:
+{ lib, buildGo118Module, fetchurl, fetchFromGitHub, nixosTests, tzdata, wire }:
 
-buildGoModule rec {
+buildGo118Module rec {
   pname = "grafana";
   version = "9.2.4";
 
