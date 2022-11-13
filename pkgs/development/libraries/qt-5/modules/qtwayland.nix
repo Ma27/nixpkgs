@@ -11,5 +11,9 @@ qtModule {
     # wrapped executables from `wrapQtAppsHook` (see comment in patch for further
     # context).  Beware: shared among different Qt5 versions.
     ./qtwayland-app_id.patch
+
+    # https://codereview.qt-project.org/c/qt/qtwayland/+/418303
+    # Fixes QT menus being broken for QT5 apps on Wayland.
+    ./qtwayland-menus-broken-fix.patch
   ];
 }
