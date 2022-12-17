@@ -18,6 +18,8 @@ buildPythonPackage rec {
 
   src = uvicorn.testsout;
 
+  format = "other";
+
   dontBuild = true;
   dontInstall = true;
 
@@ -44,6 +46,8 @@ buildPythonPackage rec {
   disabledTests = [
     "test_supported_upgrade_request"
     "test_invalid_upgrade"
+    "test_no_server_headers"
+    "test_multiple_server_header"
   ];
 }
 
