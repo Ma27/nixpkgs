@@ -1,9 +1,9 @@
 { lib, fetchFromGitHub, cacert, openssl, nixosTests
-, python39
+, python310, fetchpatch
 }:
 
 let
-  python3' = python39.override {
+  python3' = python310.override {
     packageOverrides = self: super: {
       sqlalchemy = super.sqlalchemy.overridePythonAttrs (oldAttrs: rec {
         version = "1.3.24";
@@ -44,6 +44,19 @@ let
           inherit version;
           sha256 = "sha256-ptWEM94K6AA0fKsfowQ867q+i6qdKeZo8cdoy4ejM8Y=";
         };
+        patches = [
+          # python 3.10 compat fixes. In later upstream releases, but these
+          # are not compatible with flask 1 which we need here :(
+          (fetchpatch {
+            url = "https://github.com/thmo/jinja/commit/1efb4cc918b4f3d097c376596da101de9f76585a.patch";
+            sha256 = "sha256-GFaSvYxgzOEFmnnDIfcf0ImScNTh1lR4lxt2Uz1DYdU=";
+          })
+          (fetchpatch {
+            url = "https://github.com/mkrizek/jinja/commit/bd8bad37d1c0e2d8995a44fd88e234f5340afec5.patch";
+            sha256 = "sha256-Uow+gaO+/dH6zavC0X/SsuMAfhTLRWpamVlL87DXDRA=";
+            excludes = [ "CHANGES.rst" ];
+          })
+        ];
       });
       # Required by jinja2-2.11.3
       markupsafe = super.markupsafe.overridePythonAttrs (old: rec {
