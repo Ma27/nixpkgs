@@ -1,7 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, python3, openssl, cargo, rustPlatform, rustc
-, enableSystemd ? lib.meta.availableOn stdenv.hostPlatform python3.pkgs.systemd
+{ lib
+, stdenv
+, fetchFromGitHub
+, python3
+, openssl
+, cargo
+, rustPlatform
+, rustc
 , nixosTests
-, enableRedis ? true
 , callPackage
 }:
 
@@ -9,8 +14,7 @@ let
   plugins = python3.pkgs.callPackage ./plugins { };
   tools = callPackage ./tools { };
 in
-with python3.pkgs;
-buildPythonApplication rec {
+python3.pkgs.buildPythonApplication rec {
   pname = "matrix-synapse";
   version = "1.95.1";
   format = "pyproject";
@@ -38,7 +42,7 @@ buildPythonApplication rec {
     sed -i 's/Pillow = ".*"/Pillow = ">=5.4.0"/' pyproject.toml
   '';
 
-  nativeBuildInputs = [
+  nativeBuildInputs = with python3.pkgs; [
     poetry-core
     rustPlatform.cargoSetupHook
     setuptools-rust
@@ -46,47 +50,90 @@ buildPythonApplication rec {
     rustc
   ];
 
-  buildInputs = [ openssl ];
+  buildInputs = [
+    openssl
+  ];
 
-  propagatedBuildInputs = [
-    authlib
+  propagatedBuildInputs = with python3.pkgs; [
+    attrs
     bcrypt
     bleach
     canonicaljson
-    daemonize
+    cryptography
     ijson
     immutabledict
     jinja2
     jsonschema
-    lxml
     matrix-common
     msgpack
     netaddr
+    packaging
     phonenumbers
     pillow
     prometheus-client
-    psutil
-    psycopg2
     pyasn1
+    pyasn1-modules
     pydantic
-    pyicu
     pymacaroons
-    pynacl
     pyopenssl
-    pysaml2
     pyyaml
-    requests
-    setuptools
+    service-identity
     signedjson
     sortedcontainers
     treq
     twisted
     typing-extensions
     unpaddedbase64
-  ] ++ lib.optional enableSystemd systemd
-    ++ lib.optionals enableRedis [ hiredis txredisapi ];
+  ]
+  ++ twisted.optional-dependencies.tls;
 
-  nativeCheckInputs = [ mock parameterized openssl ];
+  passthru.optional-dependencies = with python3.pkgs; {
+    postgres = if isPyPy then [
+      psycopg2cffi
+    ] else [
+      psycopg2
+    ];
+    saml2 = [
+      pysaml2
+    ];
+    oidc = [
+      authlib
+    ];
+    systemd = [
+      systemd
+    ];
+    url-preview = [
+      lxml
+    ];
+    sentry = [
+      sentry-sdk
+    ];
+    opentracing = [
+      jaeger-client
+      opentracing
+    ];
+    jwt = [
+      authlib
+    ];
+    redis = [
+      hiredis
+      txredisapi
+    ];
+    cache-memory = [
+      pympler
+    ];
+    user-search = [
+      pyicu
+    ];
+  };
+
+  nativeCheckInputs = [
+    openssl
+  ] ++ (with python3.pkgs; [
+    mock
+    parameterized
+  ])
+  ++ lib.flatten (lib.attrValues passthru.optional-dependencies);
 
   doCheck = !stdenv.isDarwin;
 
@@ -108,6 +155,7 @@ buildPythonApplication rec {
 
   meta = with lib; {
     homepage = "https://matrix.org";
+    changelog = "https://github.com/matrix-org/synapse/releases/tag/v${version}";
     description = "Matrix reference homeserver";
     license = licenses.asl20;
     maintainers = teams.matrix.members;
