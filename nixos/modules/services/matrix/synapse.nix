@@ -9,11 +9,6 @@ let
   # remove null values from the final configuration
   finalSettings = lib.filterAttrsRecursive (_: v: v != null) cfg.settings;
   configFile = format.generate "homeserver.yaml" finalSettings;
-  logConfigFile = format.generate "log_config.yaml" cfg.logConfig;
-
-  pluginsEnv = cfg.package.python.buildEnv.override {
-    extraLibs = cfg.plugins;
-  };
 
   usePostgresql = cfg.settings.database.name == "psycopg2";
   hasLocalPostgresDB = let args = cfg.settings.database.args; in
@@ -50,6 +45,27 @@ let
             "${bindAddress}"
         }:${builtins.toString listener.port}/"
     '';
+
+  wantsModule = module:
+    cfg.settings ? modules && lib.any (m: m.module == module) cfg.settings.modules;
+
+  wantedExtras = cfg.extras
+    ++ lib.optional (cfg.settings ? oidc_providers) "oidc"
+    ++ lib.optional (cfg.settings ? jwt_config) "jwt"
+    ++ lib.optional (cfg.settings ? saml2_config) "saml2"
+    ++ lib.optional (cfg.settings ? opentracing) "opentracing"
+    ++ lib.optional (cfg.settings ? redis) "redis"
+    ++ lib.optional (cfg.settings ? sentry) "sentry"
+    ++ lib.optional (cfg.settings ? user_directory) "user-search"
+    ++ lib.optional (cfg.settings.url_preview_enabled) "url-preview"
+    ++ lib.optional (cfg.settings.database.name == "psycopg2") "postgres"
+    ++ lib.optional (wantsModule "ldap_auth_provider.LdapAuthProviderModule") "matrix-synapse-ldap3";
+
+  extraPackages = lib.concatMap (extra: cfg.package.optional-dependencies.${extra}) wantedExtras;
+
+  extrasEnv = cfg.package.python.buildEnv.override {
+    extraLibs = cfg.plugins ++ extraPackages;
+  };
 in {
 
   imports = [
@@ -158,12 +174,33 @@ in {
         '';
       };
 
+      extras = mkOption {
+        type = types.listOf (types.enum (lib.attrNames pkgs.matrix-synapse.optional-dependencies));
+        default = [
+          # Support internationalized domain names in user-search
+          "user-search"
+          # Provide the JournalHandler for the default log_config
+          "systemd"
+        ];
+        example = literalExpression ''
+          [
+            # Provide statistics about caching memory consumption
+            "cache-memory"
+          ]
+        '';
+        description = lib.mdDoc ''
+          Install extras provided by matrix-synapse. Most will reconfigure some additional
+          configuration.
+
+          Note: Most extras are automatically derived from your configuration already.
+        '';
+      };
+
       plugins = mkOption {
         type = types.listOf types.package;
         default = [ ];
         example = literalExpression ''
           with config.services.matrix-synapse.package.plugins; [
-            matrix-synapse-ldap3
             matrix-synapse-pam
           ];
         '';
@@ -738,7 +775,7 @@ in {
           --generate-keys
       '';
       environment = {
-        PYTHONPATH = makeSearchPathOutput "lib" cfg.package.python.sitePackages [ pluginsEnv ];
+        PYTHONPATH = makeSearchPathOutput "lib" cfg.package.python.sitePackages [ extrasEnv ];
       } // optionalAttrs (cfg.withJemalloc) {
         LD_PRELOAD = "${pkgs.jemalloc}/lib/libjemalloc.so";
       };
