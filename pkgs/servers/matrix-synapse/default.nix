@@ -1,6 +1,10 @@
-{ lib, stdenv, fetchFromGitHub, python3, openssl, rustPlatform
-, enableSystemd ? stdenv.isLinux, nixosTests
-, enableRedis ? true
+{ lib
+, stdenv
+, fetchFromGitHub
+, python3
+, openssl
+, rustPlatform
+, nixosTests
 , callPackage
 }:
 
@@ -8,8 +12,7 @@ let
   plugins = python3.pkgs.callPackage ./plugins { };
   tools = callPackage ./tools { };
 in
-with python3.pkgs;
-buildPythonApplication rec {
+python3.pkgs.buildPythonApplication rec {
   pname = "matrix-synapse";
   version = "1.82.0";
   format = "pyproject";
@@ -33,7 +36,7 @@ buildPythonApplication rec {
     sed -i '/^setuptools_rust =/d' pyproject.toml
   '';
 
-  nativeBuildInputs = [
+  nativeBuildInputs = with python3.pkgs; [
     poetry-core
     rustPlatform.cargoSetupHook
     setuptools-rust
@@ -42,47 +45,88 @@ buildPythonApplication rec {
     rustc
   ]);
 
-  buildInputs = [ openssl ];
+  buildInputs = [
+    openssl
+  ];
 
-  propagatedBuildInputs = [
-    authlib
+  propagatedBuildInputs = with python3.pkgs; [
+    attrs
     bcrypt
     bleach
     canonicaljson
-    daemonize
+    cryptography
     ijson
     immutabledict
     jinja2
     jsonschema
-    lxml
     matrix-common
     msgpack
     netaddr
+    packaging
     phonenumbers
     pillow
     prometheus-client
-    psutil
-    psycopg2
     pyasn1
+    pyasn1-modules
     pydantic
-    pyjwt
     pymacaroons
-    pynacl
     pyopenssl
-    pysaml2
     pyyaml
-    requests
-    setuptools
+    service-identity
     signedjson
     sortedcontainers
     treq
     twisted
     typing-extensions
     unpaddedbase64
-  ] ++ lib.optional enableSystemd systemd
-    ++ lib.optionals enableRedis [ hiredis txredisapi ];
+  ]
+  # extras
+  ++ twisted.optional-dependencies.tls;
 
-  checkInputs = [ mock parameterized openssl ];
+  checkInputs = with python3.pkgs; [ mock parameterized openssl ];
+
+  passthru.optional-dependencies = with python3.pkgs; {
+    matrix-synapse-ldap3 = with plugins; [
+      matrix-synapse-ldap3
+    ];
+    postgres = if isPyPy then [
+      psycopg2cffi
+    ] else [
+      psycopg2
+    ];
+    saml2 = [
+      pysaml2
+    ];
+    oidc = [
+      authlib
+    ];
+    systemd = lib.optionals (lib.meta.availableOn stdenv.hostPlatform systemd) [
+      systemd
+    ];
+    url-preview = [
+      lxml
+    ];
+    sentry = [
+      sentry-sdk
+    ];
+    opentracing = [
+      jaeger-client
+      opentracing
+    ];
+    jwt = [
+      authlib
+    ];
+    redis = [
+      hiredis
+      txredisapi
+    ];
+    cache-memory = [
+      pympler
+    ];
+    user-search = [
+      PyICU
+    ];
+  };
 
   doCheck = !stdenv.isDarwin;
 
@@ -104,6 +148,7 @@ buildPythonApplication rec {
 
   meta = with lib; {
     homepage = "https://matrix.org";
+    changelog = "https://github.com/matrix-org/synapse/releases/tag/v${version}";
     description = "Matrix reference homeserver";
     license = licenses.asl20;
     maintainers = teams.matrix.members;
