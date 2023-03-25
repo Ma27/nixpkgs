@@ -58,8 +58,7 @@ let
     ++ lib.optional (cfg.settings ? sentry) "sentry"
     ++ lib.optional (cfg.settings ? user_directory) "user-search"
     ++ lib.optional (cfg.settings.url_preview_enabled) "url-preview"
-    ++ lib.optional (cfg.settings.database.name == "psycopg2") "postgres"
-    ++ lib.optional (wantsModule "ldap_auth_provider.LdapAuthProviderModule") "matrix-synapse-ldap3";
+    ++ lib.optional (cfg.settings.database.name == "psycopg2") "postgres";
 
   extraPackages = lib.concatMap (extra: cfg.package.optional-dependencies.${extra}) wantedExtras;
 
