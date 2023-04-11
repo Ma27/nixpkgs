@@ -27,7 +27,7 @@ buildPythonPackage rec {
     simplejson
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
