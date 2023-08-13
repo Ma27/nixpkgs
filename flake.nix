@@ -53,7 +53,26 @@
       # attribute it displays `omitted` instead of evaluating all packages,
       # which keeps `nix flake show` on Nixpkgs reasonably fast, though less
       # information rich.
-      legacyPackages = forAllSystems (system: import ./. { inherit system; });
+      legacyPackages = forAllSystems (system: import ./. {
+        inherit system;
+        # XXX custom patch from @Ma27. This is the default config I use for my deployment
+        # (and this patch should only appear on my deployment's tracking-branch).
+        # Workaround here because there's no reasonable way to (re)configure nixpkgs without
+        # having to instantiate a second one.
+        config = {
+          allowUnfree = false;
+          allowUnfreePredicate = with lib;
+            drv: elem (builtins.parseDrvName (drv.name or drv.pname)).name [
+              "chrome-widevine-cdm"
+              "chromium"
+              "chromium-binary-plugin-widevine"
+              "chromium-unwrapped"
+              "spotify"
+              "spotify-unwrapped"
+            ];
+          chromium.enableWideVine = true;
+        };
+      });
 
       nixosModules = {
         notDetected = ./nixos/modules/installer/scan/not-detected.nix;
