@@ -39273,26 +39273,29 @@ with pkgs;
     Note that you will need to have called Nixpkgs with the system
     parameter set to the right value for your deployment target.
   */
-  nixos =
-    configuration:
+  nixos = configuration:
+    nixos' {
+      modules = if builtins.isList configuration
+                then configuration
+                else [configuration];
+    };
+
+  nixos' =
+    args@{ modules, ... }:
       let
-        c = import (path + "/nixos/lib/eval-config.nix") {
+        c = import (path + "/nixos/lib/eval-config.nix") (args // {
               modules =
-                [(
+                modules ++ [(
                   { lib, ... }: {
                     config.nixpkgs.pkgs = lib.mkDefault pkgs;
                     config.nixpkgs.localSystem = lib.mkDefault stdenv.hostPlatform;
                   }
-                )] ++ (
-                  if builtins.isList configuration
-                  then configuration
-                  else [configuration]
-                );
+                )];
 
                 # The system is inherited from the current pkgs above.
                 # Set it to null, to remove the "legacy" entrypoint's non-hermetic default.
                 system = null;
-            };
+            });
       in
         c.config.system.build // c;
 
