@@ -30,7 +30,7 @@ let
     ''
       cat "$NIX_BUILD_TOP"/.attrs.json \
         | jq '${concatMapStringsSep " + " (key: ''."${key}"'') (attrNames orderedSections)}' \
-        | json2toml /dev/stdin "$out"
+        | json2toml /dev/stdin "$out" -p
     '';
 in {
   options.programs.rust-motd = {
