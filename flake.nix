@@ -33,7 +33,7 @@
 
         nixosSystem = args:
           import ./nixos/lib/eval-config.nix (
-            args // lib.optionalAttrs (! args?system) {
+            args // { inherit (self) lib; } // lib.optionalAttrs (! args?system) {
               # Allow system to be set modularly in nixpkgs.system.
               # We set it to null, to remove the "legacy" entrypoint's
               # non-hermetic default.
