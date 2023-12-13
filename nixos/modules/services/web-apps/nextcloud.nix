@@ -28,6 +28,7 @@ let
   phpPackage = cfg.phpPackage.buildEnv {
     extensions = { enabled, all }:
       (with all; enabled
+        ++ [ bz2 intl sodium ] # recommended
         ++ optional cfg.enableImagemagick imagick
         # Optionally enabled depending on caching settings
         ++ optional cfg.caching.apcu apcu
@@ -192,7 +193,7 @@ in {
     package = mkOption {
       type = types.package;
       description = lib.mdDoc "Which package to use for the Nextcloud instance.";
-      relatedPackages = [ "nextcloud26" "nextcloud27" ];
+      relatedPackages = [ "nextcloud26" "nextcloud27" "nextcloud28" ];
     };
     phpPackage = mkOption {
       type = types.package;
@@ -709,7 +710,8 @@ in {
         ++ (optional (versionOlder cfg.package.version "24") (upgradeWarning 23 "22.05"))
         ++ (optional (versionOlder cfg.package.version "25") (upgradeWarning 24 "22.11"))
         ++ (optional (versionOlder cfg.package.version "26") (upgradeWarning 25 "23.05"))
-        ++ (optional (versionOlder cfg.package.version "27") (upgradeWarning 26 "23.11"));
+        ++ (optional (versionOlder cfg.package.version "27") (upgradeWarning 26 "23.11"))
+        ++ (optional (versionOlder cfg.package.version "28") (upgradeWarning 26 "24.05"));
 
       services.nextcloud.package = with pkgs;
         mkDefault (
