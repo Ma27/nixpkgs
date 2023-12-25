@@ -6,20 +6,15 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "20231023";
+  version = "20231221";
   pname = "neomutt";
 
   src = fetchFromGitHub {
     owner  = "neomutt";
     repo   = "neomutt";
     rev    = version;
-    sha256 = "sha256-62WnL3E7acWBo7bgaa0DTyHMXezUQOEOofYI1/e7M+s=";
+    sha256 = "sha256-IXly2N/DD2+XBXVIXJw1sE/0eJwbUaONDNRMi7n1T44=";
   };
-
-  patches = [
-    # https://github.com/neomutt/neomutt/issues/3773#issuecomment-1493295144
-    ./fix-open-very-large-mailbox.patch
-  ];
 
   buildInputs = [
     cyrus_sasl gss gpgme libkrb5 libidn2 ncurses
