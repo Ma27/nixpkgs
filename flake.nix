@@ -76,6 +76,7 @@
               "chromium-unwrapped"
               "spotify"
               "spotify-unwrapped"
+              "terraform"
             ];
           chromium.enableWideVine = true;
         };
