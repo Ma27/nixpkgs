@@ -32,7 +32,7 @@ let
 in
 buildGoModule rec {
   pname = "grafana";
-  version = "10.2.6";
+  version = "10.3.1";
 
   excludedPackages = [ "alert_webhook_listener" "clean-swagger" "release_publisher" "slow_proxy" "slow_proxy_mac" "macaron" "devenv" "modowners" ];
 
@@ -40,7 +40,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-TXxTZqgDqw1VT/T2tQ1wdEh7yRuc2i9DkFK4UYKD+AQ=";
+    hash = "sha256-UPIq7BWTlT0omt/SM5+vkfOHvsdcx/ikkjcW9X8pcw0=";
   };
 
   offlineCache = stdenv.mkDerivation {
@@ -63,10 +63,10 @@ buildGoModule rec {
     dontInstall = true;
     dontFixup = true;
     outputHashMode = "recursive";
-    outputHash = "sha256-cD9Y72OWSj7zwhhAcrZouLpEFFwURSsWgDFRjwMQAxI=";
+    outputHash = "sha256-70eMa8E483f/Bz7iy+4Seap1EfIdjD5krnt6W9CUows=";
   };
 
-  vendorHash = "sha256-8xA3+y8eF3vVs6crs9cVthbpGRHYzvBokxv5LjzsEJI=";
+  vendorHash = "sha256-Gf2A22d7/8xU/ld7kveqGonVKGFCArGNansPRGhfyXM=";
 
   nativeBuildInputs = [ wire yarn jq moreutils ];
 
