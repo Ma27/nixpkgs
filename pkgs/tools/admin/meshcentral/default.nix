@@ -1,6 +1,5 @@
 { lib
 , fetchzip
-, fetchYarnDeps
 , yarn2nix-moretea
 , nodejs_18
 , dos2unix
@@ -18,11 +17,6 @@ yarn2nix-moretea.mkYarnPackage {
 
   packageJSON = ./package.json;
   yarnLock = ./yarn.lock;
-
-  offlineCache = fetchYarnDeps {
-    yarnLock = ./yarn.lock;
-    hash = "sha256-tKS7Nrd5tWuRFfl5hZXCmVBxUe+W3+uhtw0YF0IBGZU=";
-  };
 
   # Tarball has CRLF line endings. This makes patching difficult, so let's convert them.
   nativeBuildInputs = [ dos2unix ];
