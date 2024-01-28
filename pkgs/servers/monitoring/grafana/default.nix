@@ -1,8 +1,8 @@
 { lib, stdenv, buildGoModule, fetchFromGitHub, removeReferencesTo
 , tzdata, wire
-, yarn, nodejs, cacert
+, yarn, nodejs, python3, cacert
 , jq, moreutils
-, nix-update-script, nixosTests, python3
+, nix-update-script, nixosTests
 }:
 
 let
@@ -82,6 +82,14 @@ buildGoModule rec {
 
     # Setup node_modules
     export HOME="$(mktemp -d)"
+
+    # Help node-gyp find Node.js headers
+    # (see https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/javascript.section.md#pitfalls-javascript-yarn2nix-pitfalls)
+    mkdir -p $HOME/.node-gyp/${nodejs.version}
+    echo 9 > $HOME/.node-gyp/${nodejs.version}/installVersion
+    ln -sfv ${nodejs}/include $HOME/.node-gyp/${nodejs.version}
+    export npm_config_nodedir=${nodejs}
+
     yarn config set enableTelemetry 0
     yarn config set cacheFolder $offlineCache
     yarn --immutable-cache
