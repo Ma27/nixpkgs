@@ -2,6 +2,7 @@
   lib,
   python3,
   fetchPypi,
+  fetchpatch,
   fetchFromGitHub,
   withE2BE ? true,
 }:
@@ -10,6 +11,21 @@ let
   python = python3.override {
     self = python;
     packageOverrides = self: super: {
+      # https://github.com/mautrix/python/pull/168
+      mautrix = (super.mautrix.override { withOlm = withE2BE; }).overridePythonAttrs (
+        {
+          patches ? [ ],
+          ...
+        }:
+        {
+          patches = patches ++ [
+            (fetchpatch {
+              url = "https://github.com/mautrix/python/commit/c964dbcc0ed880e6328ff92f81ef62153d43b4fc.patch";
+              hash = "sha256-12tnqv8KIfsO7+EX2G9S2nVEXnaqv5dt3lujGpcQCcI=";
+            })
+          ];
+        }
+      );
       tulir-telethon = self.telethon.overridePythonAttrs (oldAttrs: rec {
         version = "1.37.0a1";
         pname = "tulir-telethon";
@@ -36,7 +52,14 @@ python.pkgs.buildPythonPackage rec {
 
   format = "setuptools";
 
-  patches = [ ./0001-Re-add-entrypoint.patch ];
+  patches = [
+    ./0001-Re-add-entrypoint.patch
+    # https://github.com/mautrix/telegram/pull/955
+    (fetchpatch {
+      url = "https://github.com/mautrix/telegram/commit/738381a04f4c75346e74afa4b14f330d69cd0f6d.patch";
+      hash = "sha256-qvzIk+UvHEmQ7JYu9ytzxR7RZiW0iNr0WiFRSHbZLAM=";
+    })
+  ];
 
   propagatedBuildInputs =
     with python.pkgs;
@@ -47,7 +70,7 @@ python.pkgs.buildPythonPackage rec {
         commonmark
         aiohttp
         yarl
-        (mautrix.override { withOlm = withE2BE; })
+        mautrix
         tulir-telethon
         asyncpg
         mako
