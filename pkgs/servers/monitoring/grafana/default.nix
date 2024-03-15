@@ -2,7 +2,7 @@
 , tzdata, wire
 , yarn, nodejs, cacert
 , jq, moreutils
-, nix-update-script, nixosTests
+, nix-update-script, nixosTests, python3
 }:
 
 let
@@ -32,7 +32,7 @@ let
 in
 buildGoModule rec {
   pname = "grafana";
-  version = "10.3.3";
+  version = "10.4.0";
 
   subPackages = [ "pkg/cmd/grafana" "pkg/cmd/grafana-server" "pkg/cmd/grafana-cli" ];
 
@@ -40,7 +40,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-uAfHcW9j+al8IIH2N6X5wssQmSXqJjVQzwERBCxGxVE=";
+    hash = "sha256-Rp2jGspbmqJFzSbiVy2/5oqQJnAdGG/T+VNBHVsHSwg=";
   };
 
   offlineCache = stdenv.mkDerivation {
@@ -48,7 +48,7 @@ buildGoModule rec {
     inherit src;
     nativeBuildInputs = [
       yarn nodejs cacert
-      jq moreutils
+      jq moreutils python3
     ];
     postPatch = ''
       ${patchAwayGrafanaE2E}
@@ -67,14 +67,14 @@ buildGoModule rec {
     dontInstall = true;
     dontFixup = true;
     outputHashMode = "recursive";
-    outputHash = "sha256-70eMa8E483f/Bz7iy+4Seap1EfIdjD5krnt6W9CUows=";
+    outputHash = "sha256-QdyXSPshzugkDTJoUrJlHNuhPAyR9gae5Cbk8Q8FSl4=";
   };
 
   disallowedRequisites = [ offlineCache ];
 
-  vendorHash = "sha256-nGv/DBNnQ4AOJtrsYIGLCrV1xNmBN0dDf6u46R3TAHo=";
+  vendorHash = "sha256-cNkMVLXp3hPMcW0ilOM0VlrrDX/IsZaze+/6qlTfmRs=";
 
-  nativeBuildInputs = [ wire yarn jq moreutils removeReferencesTo ];
+  nativeBuildInputs = [ wire yarn jq moreutils removeReferencesTo python3 ];
 
   postPatch = ''
     ${patchAwayGrafanaE2E}
