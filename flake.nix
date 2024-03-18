@@ -77,6 +77,8 @@
               "spotify"
               "spotify-unwrapped"
               "terraform"
+              # for work
+              "1password-cli"
             ];
           chromium.enableWideVine = true;
         };
