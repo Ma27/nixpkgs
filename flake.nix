@@ -102,6 +102,7 @@
                 "chromium-unwrapped"
                 "spotify"
                 "spotify-unwrapped"
+                "1password-cli"
               ];
             chromium.enableWideVine = true;
           };
