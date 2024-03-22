@@ -21,7 +21,7 @@ let
 in
 buildGoModule rec {
   pname = "grafana";
-  version = "10.4.0";
+  version = "10.4.1";
 
   subPackages = [ "pkg/cmd/grafana" "pkg/cmd/grafana-server" "pkg/cmd/grafana-cli" ];
 
@@ -29,7 +29,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-Rp2jGspbmqJFzSbiVy2/5oqQJnAdGG/T+VNBHVsHSwg=";
+    hash = "sha256-wKYn6EcfQlWj/6rKnGYphzq3IThRj6qCjpqwllNPht8=";
   };
 
   offlineCache = stdenv.mkDerivation {
