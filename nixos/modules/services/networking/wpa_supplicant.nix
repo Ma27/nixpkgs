@@ -94,7 +94,7 @@ let
     let
       deviceUnit = optional (iface != null) "sys-subsystem-net-devices-${utils.escapeSystemdPath iface}.device";
       configStr = if cfg.allowAuxiliaryImperativeNetworks
-        then "-c /etc/wpa_supplicant.conf -I ${finalConfig}"
+        then "-c /etc/wpa_supplicant/mutable.conf -I ${finalConfig}"
         else "-c ${finalConfig}";
     in {
       description = "WPA Supplicant instance" + optionalString (iface != null) " for interface ${iface}";
