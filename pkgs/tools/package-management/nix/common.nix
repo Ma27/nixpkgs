@@ -15,6 +15,7 @@ let
   atLeast210 = lib.versionAtLeast version "2.10pre";
   atLeast213 = lib.versionAtLeast version "2.13pre";
   atLeast214 = lib.versionAtLeast version "2.14pre";
+  atLeast219 = lib.versionAtLeast version "2.19pre";
   atLeast221 = lib.versionAtLeast version "2.21pre";
   # Major.minor versions unaffected by CVE-2024-27297
   unaffectedByFodSandboxEscape = [
@@ -42,6 +43,7 @@ in
 , docbook5
 , editline
 , flex
+, git
 , gnutar
 , gtest
 , gzip
@@ -53,6 +55,7 @@ in
 , libxml2
 , libxslt
 , lowdown
+, man
 , mdbook
 , mdbook-linkcheck
 , nlohmann_json
@@ -143,6 +146,12 @@ self = stdenv.mkDerivation {
     libseccomp
   ] ++ lib.optionals withAWS [
     aws-sdk-cpp
+  ];
+
+  installCheckInputs = lib.optionals atLeast221 [
+    git
+  ] ++ lib.optionals atLeast219 [
+    man
   ];
 
   propagatedBuildInputs = [
