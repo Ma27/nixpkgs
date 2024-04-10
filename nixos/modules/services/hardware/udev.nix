@@ -166,10 +166,17 @@ let
       mv etc/udev/hwdb.bin $out
     '';
 
-  compressFirmware = firmware: if (config.boot.kernelPackages.kernelAtLeast "5.3" && (firmware.compressFirmware or true)) then
-    pkgs.compressFirmwareXz firmware
-  else
-    id firmware;
+  compressFirmware = firmware:
+    let
+      inherit (config.boot.kernelPackages) kernelAtLeast;
+      compress =
+        if ! (firmware.compressFirmware or true) then
+          id
+        else
+          if kernelAtLeast "5.19" then pkgs.compressFirmwareZstd
+          else if kernelAtLeast "5.3" then pkgs.compressFirmwareXz
+          else id;
+    in compress firmware;
 
   # Udev has a 512-character limit for ENV{PATH}, so create a symlink
   # tree to work around this.
