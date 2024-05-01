@@ -964,6 +964,7 @@ in {
 
         in {
           wantedBy = [ "multi-user.target" ];
+          wants = [ "nextcloud-update-db.service" ];
           before = [ "phpfpm-nextcloud.service" ];
           after = optional mysqlLocal "mysql.service" ++ optional pgsqlLocal "postgresql.service";
           requires = optional mysqlLocal "mysql.service" ++ optional pgsqlLocal "postgresql.service";
@@ -1021,7 +1022,6 @@ in {
         nextcloud-cron = {
           after = [ "nextcloud-setup.service" ];
           environment.NEXTCLOUD_CONFIG_DIR = "${datadir}/config";
-          serviceConfig.Type = "oneshot";
           serviceConfig.User = "nextcloud";
           serviceConfig.ExecStart = "${phpPackage}/bin/php -f ${webroot}/cron.php";
         };
@@ -1031,6 +1031,19 @@ in {
           serviceConfig.ExecStart = "${occ}/bin/nextcloud-occ app:update --all";
           serviceConfig.User = "nextcloud";
           startAt = cfg.autoUpdateApps.startAt;
+        };
+        nextcloud-update-db = {
+          after = [ "nextcloud-setup.service" ];
+          environment.NEXTCLOUD_CONFIG_DIR = "${datadir}/config";
+          script = ''
+            ${occ}/bin/nextcloud-occ db:add-missing-columns
+            ${occ}/bin/nextcloud-occ db:add-missing-indices
+            ${occ}/bin/nextcloud-occ db:add-missing-primary-keys
+          '';
+          serviceConfig = {
+            User = "nextcloud";
+            ExecCondition = "${lib.getExe phpPackage} -f ${webroot}/occ status -e";
+          };
         };
       };
 
