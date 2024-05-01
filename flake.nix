@@ -77,6 +77,9 @@
               "spotify"
               "spotify-unwrapped"
               "terraform"
+              "steam"
+              "steam-original"
+              "steam-run"
               # for work
               "1password-cli"
             ];
