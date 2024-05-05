@@ -76,7 +76,6 @@
               "chromium-unwrapped"
               "spotify"
               "spotify-unwrapped"
-              "terraform"
               "steam"
               "steam-original"
               "steam-run"
