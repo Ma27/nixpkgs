@@ -65,4 +65,9 @@
     name = "export-rt-sched-migrate";
     patch = ./export-rt-sched-migrate.patch;
   };
+
+  zstd-configurable-level-6_x = {
+    name = "allow-setting-zstd-compression-level-for-kernel-6_x.patch";
+    patch = ./v2-0001-kbuild-allow-setting-zstd-compression-level-for-m.patch;
+  };
 }
