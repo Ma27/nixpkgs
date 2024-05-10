@@ -138,6 +138,7 @@ in {
       kernelPatches = [
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
+        kernelPatches.zstd-configurable-level
       ];
     };
 
@@ -146,6 +147,7 @@ in {
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
         kernelPatches.export-rt-sched-migrate
+        kernelPatches.zstd-configurable-level
       ];
     };
 
@@ -154,6 +156,7 @@ in {
       kernelPatches = [
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
+        kernelPatches.zstd-configurable-level-6_x
       ];
     };
 
@@ -162,6 +165,7 @@ in {
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
         kernelPatches.export-rt-sched-migrate
+        kernelPatches.zstd-configurable-level-6_x
       ];
     };
 
@@ -170,6 +174,7 @@ in {
       kernelPatches = [
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
+        kernelPatches.zstd-configurable-level-6_x
       ];
     };
 
@@ -178,6 +183,7 @@ in {
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
         kernelPatches.export-rt-sched-migrate
+        kernelPatches.zstd-configurable-level-6_x
       ];
     };
 
@@ -213,6 +219,7 @@ in {
         kernelPatches = [
           kernelPatches.bridge_stp_helper
           kernelPatches.request_key_helper
+          kernelPatches.zstd-configurable-level-6_x
         ];
       };
       latest = packageAliases.linux_latest.kernel;

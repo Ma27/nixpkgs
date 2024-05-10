@@ -1048,8 +1048,10 @@ let
           (whenOlder "5.13" yes)
           (whenAtLeast "6.12" yes)
         ];
-        MODULE_COMPRESS_ALL = whenAtLeast "6.12" yes;
-        MODULE_COMPRESS_XZ = yes;
+        MODULE_COMPRESS_XZ         = whenOlder "5.13" yes;
+        MODULE_COMPRESS_ZSTD       = whenAtLeast "5.13" yes;
+        MODULE_COMPRESS_ZSTD_LEVEL = whenAtLeast "5.13" (freeform "19");
+
 
         SYSVIPC = yes; # System-V IPC
 
