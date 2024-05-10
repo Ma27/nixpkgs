@@ -437,6 +437,7 @@ lib.makeOverridable (
           if [ -z "''${dontStrip-}" ]; then
             installFlagsArray+=("INSTALL_MOD_STRIP=1")
           fi
+          export ZSTD_CLEVEL=19
           make modules_install $makeFlags "''${makeFlagsArray[@]}" \
             $installFlags "''${installFlagsArray[@]}"
           unlink $out/lib/modules/${modDirVersion}/build
