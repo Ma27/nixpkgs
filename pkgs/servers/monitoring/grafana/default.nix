@@ -3,6 +3,7 @@
 , yarn, nodejs, python3, cacert
 , jq, moreutils
 , nix-update-script, nixosTests, xcbuild
+, util-linux
 }:
 
 let
@@ -28,7 +29,7 @@ let
 in
 buildGoModule rec {
   pname = "grafana";
-  version = "10.4.11";
+  version = "11.0.0";
 
   subPackages = [ "pkg/cmd/grafana" "pkg/cmd/grafana-server" "pkg/cmd/grafana-cli" ];
 
@@ -36,7 +37,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-RncdK/y4XyHD2l9/0+dxNxJyqoZMa05u1GIO8UKTkgc=";
+    hash = "sha256-cC1dpgb8IiyPIqlVvn8Qi1l7j6lLtQF+BOOO+DQCp4E=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
@@ -73,16 +74,16 @@ buildGoModule rec {
     dontFixup = true;
     outputHashMode = "recursive";
     outputHash = rec {
-      x86_64-linux = "sha256-BKvYnXgk7JNkjnka7Co/AfI3d+j/OapXLjS47yoSVPI=";
+      x86_64-linux = "sha256-+Udq8oQSIAHku55VKnrfgHHevzBels0QiOZwnwuts8k=";
       aarch64-linux = x86_64-linux;
-      aarch64-darwin = "sha256-Rr3NSHrb8aYt1gEfv2huexA2O/6zVIzdM56pTWSob6s=";
+      aarch64-darwin = "sha256-m3jtZNz0J2nZwFHXVp3ApgDfnGBOJvFeUpqOPQqv200=";
       x86_64-darwin = aarch64-darwin;
     }.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
   };
 
   disallowedRequisites = [ offlineCache ];
 
-  vendorHash = "sha256-gP/lW6CXQpBv9dPRTOV5+vmaqTcq+91X2jls9gDrnm0=";
+  vendorHash = "sha256-kcdW6RQghyAOZUDmIo9G6YBC+YaLHdafvj+fCd+dcDE=";
 
   proxyVendor = true;
 
@@ -99,7 +100,6 @@ buildGoModule rec {
     wire gen -tags oss ./pkg/server
     wire gen -tags oss ./pkg/cmd/grafana-cli/runner
 
-    GOARCH= CGO_ENABLED=0 go generate ./pkg/plugins/plugindef
     GOARCH= CGO_ENABLED=0 go generate ./kinds/gen.go
     GOARCH= CGO_ENABLED=0 go generate ./public/app/plugins/gen.go
     # Setup node_modules
@@ -114,7 +114,7 @@ buildGoModule rec {
 
     yarn config set enableTelemetry 0
     yarn config set cacheFolder $offlineCache
-    yarn --immutable-cache
+    yarn install --immutable-cache
 
     # The build OOMs on memory constrained aarch64 without this
     export NODE_OPTIONS=--max_old_space_size=4096
@@ -122,7 +122,7 @@ buildGoModule rec {
 
   postBuild = ''
     # After having built all the Go code, run the JS builders now.
-    yarn run build
+    ${util-linux}/bin/script -c 'yarn run build' /dev/null
     yarn run plugins:build-bundled
   '';
 
