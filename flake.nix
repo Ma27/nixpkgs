@@ -73,6 +73,7 @@
               "chrome-widevine-cdm"
               "chromium"
               "chromium-binary-plugin-widevine"
+              "widevine-cdm"
               "chromium-unwrapped"
               "spotify"
               "spotify-unwrapped"
