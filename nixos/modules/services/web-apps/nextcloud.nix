@@ -820,6 +820,16 @@ in {
         '';
       };
     };
+
+    cron.memoryLimit = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "1G";
+      description = ''
+        The `memory_limit` of PHP is equal to [](#opt-services.nextcloud.maxUploadSize).
+        The value can be customized for `nextcloud-cron.service` using this option.
+      '';
+    };
   };
 
   config = mkIf cfg.enable (mkMerge [
@@ -1022,8 +1032,19 @@ in {
         nextcloud-cron = {
           after = [ "nextcloud-setup.service" ];
           environment.NEXTCLOUD_CONFIG_DIR = "${datadir}/config";
-          serviceConfig.User = "nextcloud";
-          serviceConfig.ExecStart = "${phpPackage}/bin/php -f ${webroot}/cron.php";
+          serviceConfig = {
+            Type = "exec";
+            User = "nextcloud";
+            ExecCondition = "${lib.getExe phpPackage} -f ${webroot}/occ status -e";
+            ExecStart = lib.concatStringsSep " " ([
+              (lib.getExe phpPackage)
+            ] ++ optional (cfg.cron.memoryLimit != null) "-dmemory_limit=${cfg.cron.memoryLimit}"
+              ++ [
+              "-f"
+              "${webroot}/cron.php"
+            ]);
+            KillMode = "process";
+          };
         };
         nextcloud-update-plugins = mkIf cfg.autoUpdateApps.enable {
           after = [ "nextcloud-setup.service" ];
