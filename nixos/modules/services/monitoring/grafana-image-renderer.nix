@@ -10,6 +10,14 @@ let
   format = pkgs.formats.json { };
 
   configFile = format.generate "grafana-image-renderer-config.json" cfg.settings;
+
+  grafanaHttpAddr = config.services.grafana.settings.server.http_addr;
+  grafanaPort = toString config.services.grafana.settings.server.http_port;
+  callbackURL =
+    if null != builtins.match "([0-9a-fA-F]*:){0,8}[0-9a-fA-F]*" grafanaHttpAddr then
+      "http://[${grafanaHttpAddr}]:${grafanaPort}"
+    else
+      "http://${grafanaHttpAddr}:${grafanaPort}";
 in
 {
   options.services.grafana-image-renderer = {
@@ -121,7 +129,7 @@ in
 
     services.grafana.settings.rendering = lib.mkIf cfg.provisionGrafana {
       server_url = "http://localhost:${toString cfg.settings.service.port}/render";
-      callback_url = "http://${config.services.grafana.settings.server.http_addr}:${toString config.services.grafana.settings.server.http_port}";
+      callback_url = callbackURL;
     };
 
     services.grafana-image-renderer.chromium = lib.mkDefault pkgs.chromium;
@@ -142,7 +150,7 @@ in
     systemd.services.grafana-image-renderer = {
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
-      description = " A Grafana backend plugin that handles rendering of panels & dashboards to PNGs using headless browser (Chromium/Chrome)";
+      description = "A Grafana backend plugin that handles rendering of panels & dashboards to PNGs using headless browser (Chromium/Chrome)";
 
       environment = {
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true";
