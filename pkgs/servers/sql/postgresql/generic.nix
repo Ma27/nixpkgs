@@ -74,10 +74,6 @@ let
       disallowedReferences = [ "dev" "doc" "man" ];
       disallowedRequisites = [
         stdenv'.cc
-      ] ++ lib.optionals (!jitSupport) [
-        # TODO: Can this and all the other -dev references for build inputs
-        # safely be removed from all the -out/lib/bitcode/**/*.bc files?
-        zlib.dev
       ] ++ lib.optionals jitSupport [
         llvmPackages.llvm.out
         llvmPackages.llvm.dev
@@ -219,6 +215,9 @@ let
       '' + lib.optionalString jitSupport ''
         # In the case of JIT support, prevent a retained dependency on clang-wrapper
         remove-references-to -t "$NIX_CC" "$out/lib/llvmjit_types.bc"
+        remove-references-to -t "${libxml2.dev}" "$out/lib/bitcode/pgxml/xpath.bc"
+        remove-references-to -t "${zlib.dev}" "$out/lib/bitcode/postgres/backup/basebackup_gzip.bc"
+        remove-references-to -t "${zlib.dev}" "$out/lib/bitcode/pgcrypto/pgp-compress.bc"
         find "$out/lib/bitcode" -type f -exec remove-references-to -t "$NIX_CC" '{}' +
         # Stop lib depending on the -dev output of llvm
         remove-references-to -t ${llvmPackages.llvm.dev} "$out/lib/llvmjit${dlSuffix}"
