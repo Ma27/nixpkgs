@@ -111,7 +111,6 @@ in buildGoModule rec {
     homepage = "https://about.gitea.com";
     license = licenses.mit;
     maintainers = with maintainers; [ ma27 techknowlogick SuperSandro2000 ];
-    broken = stdenv.isDarwin;
     mainProgram = "gitea";
   };
 }
