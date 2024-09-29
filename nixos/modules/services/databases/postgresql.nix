@@ -643,9 +643,10 @@ in
             ProtectProc = "invisible";
             RemoveIPC = true;
             RestrictAddressFamilies = [
-              "AF_UNIX"
               "AF_INET"
               "AF_INET6"
+              "AF_NETLINK" # used for network interface enumeration
+              "AF_UNIX"
             ];
             RestrictNamespaces = true;
             RestrictRealtime = true;
