@@ -655,8 +655,11 @@ in
               "@system-service"
               "~@privileged @resources"
             ];
-            UMask = "0077";
+            UMask = if groupAccessAvailable then "0027" else "0077";
           }
+          (mkIf (cfg.dataDir != "/var/lib/postgresql") {
+            ReadWritePaths = [ cfg.dataDir ];
+          })
           (mkIf (cfg.dataDir == "/var/lib/postgresql/${cfg.package.psqlSchema}") {
             StateDirectory = "postgresql postgresql/${cfg.package.psqlSchema}";
             StateDirectoryMode = if groupAccessAvailable then "0750" else "0700";
