@@ -851,7 +851,7 @@ in {
           else if versionOlder stateVersion "23.05" then nextcloud25
           else if versionOlder stateVersion "23.11" then nextcloud26
           else if versionOlder stateVersion "24.05" then nextcloud27
-          else nextcloud29
+          else nextcloud30
         );
 
       services.nextcloud.phpPackage =
