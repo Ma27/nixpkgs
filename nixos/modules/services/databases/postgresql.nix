@@ -628,7 +628,7 @@ in
             PrivateTmp = true;
             ProtectHome = true;
             ProtectSystem = "strict";
-            MemoryDenyWriteExecute = true;
+            MemoryDenyWriteExecute = lib.mkDefault (config.services.postgresql.settings.jit == "off");
             NoNewPrivileges = true;
             LockPersonality = true;
             PrivateDevices = true;
