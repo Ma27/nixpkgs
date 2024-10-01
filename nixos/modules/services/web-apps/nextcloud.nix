@@ -816,7 +816,7 @@ in {
 
   config = mkIf cfg.enable (mkMerge [
     { warnings = let
-        latest = 29;
+        latest = 30;
         upgradeWarning = major: nixos:
           ''
             A legacy Nextcloud install (from before NixOS ${nixos}) may be installed.
@@ -851,7 +851,7 @@ in {
           else if versionOlder stateVersion "23.05" then nextcloud25
           else if versionOlder stateVersion "23.11" then nextcloud26
           else if versionOlder stateVersion "24.05" then nextcloud27
-          else nextcloud29
+          else nextcloud30
         );
 
       services.nextcloud.phpPackage =
