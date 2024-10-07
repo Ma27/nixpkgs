@@ -6,9 +6,17 @@
 , util-linux
 }:
 
+let
+  # Grafana seems to just set it to the latest version available
+  # nowadays.
+  patchGoVersion = ''
+    substituteInPlace go.{mod,work} pkg/{apiserver,apimachinery,build{,/wire},promlib,semconv,storage/unified/resource}/go.mod \
+      --replace-fail "go 1.22.7" "go 1.22.6"
+  '';
+in
 buildGoModule rec {
   pname = "grafana";
-  version = "11.2.1";
+  version = "11.2.2";
 
   subPackages = [ "pkg/cmd/grafana" "pkg/cmd/grafana-server" "pkg/cmd/grafana-cli" ];
 
@@ -16,7 +24,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-rMRzrGdTPfGzMtE3xej5dSOjyyEMn66oPjDUWifMjnQ=";
+    hash = "sha256-rELvOqKVf/Dmh38fxvvFzNM9zRQF9J8OyidXJvuubzs=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
@@ -49,6 +57,7 @@ buildGoModule rec {
     dontConfigure = true;
     dontInstall = true;
     dontFixup = true;
+    postPatch = patchGoVersion;
     outputHashMode = "recursive";
     outputHash = rec {
       x86_64-linux = "sha256-rz/IP6wi4VKWgO8P4Mov3oviwsDe5iBSKamArVR/+T0=";
@@ -65,6 +74,8 @@ buildGoModule rec {
   proxyVendor = true;
 
   nativeBuildInputs = [ wire yarn jq moreutils removeReferencesTo python3 ] ++ lib.optionals stdenv.isDarwin [ xcbuild.xcbuild ];
+
+  postPatch = patchGoVersion;
 
   postConfigure = ''
     # Generate DI code that's required to compile the package.
