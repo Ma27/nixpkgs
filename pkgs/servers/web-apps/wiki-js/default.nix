@@ -9,6 +9,11 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-beP9k1msJjg9IQbU/CmzTodjMvUnWrLYcw0EleR1OJk=";
   };
 
+  preUnpack = ''
+    mkdir source
+    cd source
+  '';
+
   sourceRoot = ".";
 
   dontBuild = true;
