@@ -1,4 +1,4 @@
-{ lib, stdenv, buildGoModule, fetchFromGitHub, removeReferencesTo
+{ lib, stdenv, buildGo123Module, fetchFromGitHub, removeReferencesTo
 , tzdata, wire
 , yarn, nodejs, python3, cacert
 , jq, moreutils
@@ -6,17 +6,9 @@
 , util-linux
 }:
 
-let
-  # Grafana seems to just set it to the latest version available
-  # nowadays.
-  patchGoVersion = ''
-    substituteInPlace go.{mod,work} pkg/{apiserver,apimachinery,build{,/wire},promlib,semconv,storage/unified/resource}/go.mod \
-      --replace-fail "go 1.22.7" "go 1.22.6"
-  '';
-in
-buildGoModule rec {
+buildGo123Module rec {
   pname = "grafana";
-  version = "11.2.2+security-01";
+  version = "11.3.0";
 
   subPackages = [ "pkg/cmd/grafana" "pkg/cmd/grafana-server" "pkg/cmd/grafana-cli" ];
 
@@ -24,7 +16,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-1ZDX0R3t6CAdIfrYfR373olGL5orSDs2iwriAszl7qk=";
+    hash = "sha256-tPPhRCZ8auVaX68YhGzpkykxqln8zzqdAZiedpmYqlk=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
@@ -57,25 +49,22 @@ buildGoModule rec {
     dontConfigure = true;
     dontInstall = true;
     dontFixup = true;
-    postPatch = patchGoVersion;
     outputHashMode = "recursive";
     outputHash = rec {
-      x86_64-linux = "sha256-rz/IP6wi4VKWgO8P4Mov3oviwsDe5iBSKamArVR/+T0=";
+      x86_64-linux = "sha256-8XuRhipddv28msoSpG5WjpHc7NUEh4/+wRutKrY9r1U=";
       aarch64-linux = x86_64-linux;
-      aarch64-darwin = "sha256-9J9wD8nJ4JEUKroxCEBYZytywzjGkGhujdj9FcNe0rM=";
+      aarch64-darwin = "sha256-IOuE2QjZmeCOZdqA49RWoAtz2FROGqWo8Dp4wFnEkkk=";
       x86_64-darwin = aarch64-darwin;
     }.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
   };
 
   disallowedRequisites = [ offlineCache ];
 
-  vendorHash = "sha256-shQ39N9YxksfzHDgHx3qjLbZfv5D1+sqtpALI0hCK3U=";
+  vendorHash = "sha256-3dRXvBmorItNa2HAFhEhMxKwD4LSKSgTUSjukOV2RSg=";
 
   proxyVendor = true;
 
   nativeBuildInputs = [ wire yarn jq moreutils removeReferencesTo python3 ] ++ lib.optionals stdenv.isDarwin [ xcbuild.xcbuild ];
-
-  postPatch = patchGoVersion;
 
   postConfigure = ''
     # Generate DI code that's required to compile the package.
