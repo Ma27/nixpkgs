@@ -49,7 +49,7 @@ class QMPSession:
         sock.connect(str(path))
         return cls(sock)
 
-    def close(self) -> None:
+    def __del__(self) -> None:
         self.sock.close()
 
     def _wait_for_new_result(self) -> dict[str, str]:
