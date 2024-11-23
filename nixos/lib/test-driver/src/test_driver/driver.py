@@ -97,16 +97,7 @@ class Driver:
         with self.logger.nested("cleanup"):
             self.race_timer.cancel()
             for machine in self.machines:
-                try:
-                    machine.release()
-                except Exception as e:
-                    self.logger.error(f"Error during cleanup of {machine.name}: {e}")
-
-            for vlan in self.vlans:
-                try:
-                    vlan.stop()
-                except Exception as e:
-                    self.logger.error(f"Error during cleanup of vlan{vlan.nr}: {e}")
+                machine.release()
 
     def subtest(self, name: str) -> Iterator[None]:
         """Group logs under a given test name"""
