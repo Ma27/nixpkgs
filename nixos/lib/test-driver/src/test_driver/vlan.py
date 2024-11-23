@@ -59,7 +59,7 @@ class VLan:
 
         self.logger.info(f"running vlan (pid {self.pid}; ctl {self.socket_dir})")
 
-    def stop(self) -> None:
+    def __del__(self) -> None:
         self.logger.info(f"kill vlan (pid {self.pid})")
         self.fd.close()
         self.process.terminate()
