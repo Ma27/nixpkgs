@@ -21,7 +21,7 @@
 
 buildGoModule rec {
   pname = "grafana";
-  version = "11.3.4";
+  version = "11.4.0";
 
   subPackages = [
     "pkg/cmd/grafana"
@@ -33,7 +33,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-+f2aI98NsuIoy5wT9UuFlgdzjamocswbmRtoQXTqulI=";
+    hash = "sha256-47jQ+ksq6zdS73o884q0xKLtOHssTnaIPdDOejlv/gU=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
