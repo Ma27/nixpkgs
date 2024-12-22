@@ -1024,14 +1024,6 @@ in
         ];
 
       systemd.services = {
-        # When upgrading the Nextcloud package, Nextcloud can report errors such as
-        # "The files of the app [all apps in /var/lib/nextcloud/apps] were not replaced correctly"
-        # Restarting phpfpm on Nextcloud package update fixes these issues (but this is a workaround).
-        phpfpm-nextcloud.restartTriggers = [
-          webroot
-          overrideConfig
-        ];
-
         nextcloud-setup =
           let
             c = cfg.config;
@@ -1186,6 +1178,16 @@ in
             User = "nextcloud";
             ExecCondition = "${phpCli} -f ${webroot}/occ status -e";
           };
+        };
+
+        phpfpm-nextcloud = {
+          # When upgrading the Nextcloud package, Nextcloud can report errors such as
+          # "The files of the app [all apps in /var/lib/nextcloud/apps] were not replaced correctly"
+          # Restarting phpfpm on Nextcloud package update fixes these issues (but this is a workaround).
+          restartTriggers = [
+            webroot
+            overrideConfig
+          ];
         };
       };
 
