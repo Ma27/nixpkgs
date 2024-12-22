@@ -71,11 +71,10 @@ in
     );
 
   config = lib.mkIf cfg.enable {
-    systemd.services.nextcloud-notify_push =
-      let
+    systemd.services = {
+      nextcloud-notify_push = let
         nextcloudUrl = "http${lib.optionalString cfgN.https "s"}://${cfgN.hostName}";
-      in
-      {
+      in {
         description = "Push daemon for Nextcloud clients";
         documentation = [ "https://github.com/nextcloud/notify_push" ];
         after = [
@@ -89,9 +88,6 @@ in
           DATABASE_PREFIX = cfg.dbtableprefix;
           LOG = cfg.logLevel;
         };
-        postStart = ''
-          ${cfgN.occ}/bin/nextcloud-occ notify_push:setup ${nextcloudUrl}/push
-        '';
         script =
           let
             dbType = if cfg.dbtype == "pgsql" then "postgresql" else cfg.dbtype;
@@ -115,8 +111,8 @@ in
             dbName = lib.optionalString (cfg.dbname != null) "/${cfg.dbname}";
             dbUrl = "${dbType}://${dbUser}${dbPass}${dbHost}${dbName}${dbOpts}";
           in
-          lib.optionalString (dbPass != "") ''
-            export DATABASE_PASSWORD="$(<"${cfg.dbpassFile}")"
+          lib.optionalString (cfg.dbpassFile != null) ''
+            export DATABASE_PASSWORD="$(<"$CREDENTIALS_DIRECTORY/dbpass")"
           ''
           + ''
             export DATABASE_URL="${dbUrl}"
@@ -129,8 +125,26 @@ in
           Restart = "on-failure";
           RestartSec = "5s";
           Type = "notify";
+          LoadCredential = lib.optional (cfg.dbpassFile != null) "dbpass:${cfg.dbpassFile}";
         };
       };
+
+      nextcloud-notify_push_setup = let
+
+        nextcloudUrl = "http${lib.optionalString cfgN.https "s"}://${cfgN.hostName}";
+      in {
+        wantedBy = [ "multi-user.target" ];
+        requiredBy = [ "nextcloud-notify_push.service" ];
+        after = [ "nextcloud-notify_push.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          User = "nextcloud";
+          Group = "nextcloud";
+          ExecStart = "${lib.getExe cfgN.occ} notify_push:setup ${nextcloudUrl}/push";
+          LoadCredential = config.systemd.services.nextcloud-cron.serviceConfig.LoadCredential;
+        };
+      };
+    };
 
     networking.hosts = lib.mkIf cfg.bendDomainToLocalhost {
       "127.0.0.1" = [ cfgN.hostName ];
