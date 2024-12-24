@@ -226,6 +226,7 @@
                 "chromium-binary-plugin-widevine"
                 "widevine-cdm"
                 "chromium-unwrapped"
+                "minecraft-server"
                 "spotify"
                 "spotify-unwrapped"
                 "1password-cli"
