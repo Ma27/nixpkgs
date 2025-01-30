@@ -19,9 +19,19 @@
   git,
 }:
 
+let
+  # Grafana seems to just set it to the latest version available
+  # nowadays.
+  patchGoVersion = ''
+    substituteInPlace go.{mod,work} apps/alerting/notifications/go.mod pkg/storage/unified/apistore/go.mod pkg/storage/unified/resource/go.mod \
+      --replace-fail "go 1.23.5" "go 1.23.4"
+    substituteInPlace Makefile \
+      --replace-fail "GO_VERSION = 1.23.5" "GO_VERSION = 1.23.4"
+  '';
+in
 buildGoModule rec {
   pname = "grafana";
-  version = "11.4.0";
+  version = "11.5.0";
 
   subPackages = [
     "pkg/cmd/grafana"
@@ -33,7 +43,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-47jQ+ksq6zdS73o884q0xKLtOHssTnaIPdDOejlv/gU=";
+    hash = "sha256-c0C+/mH5PojwE86ni5huLPoymloeLOGCiutvSPcKobs=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
@@ -76,9 +86,9 @@ buildGoModule rec {
     outputHashMode = "recursive";
     outputHash =
       rec {
-        x86_64-linux = "sha256-KmrbfE4QQV/PBoR/SdNqSJxF01xqZFMI4dz1JZ+E4Kg=";
+        x86_64-linux = "sha256-ZGsEAyvAMUKJoNRArtS3fZUoC4c8WDizwugzJY89+dE=";
         aarch64-linux = x86_64-linux;
-        aarch64-darwin = "sha256-pfEf49Cvx9P74SIUqQj4emwX+VBYfa7+BXu+nL1kBc8=";
+        aarch64-darwin = "sha256-NbbX8cewI7fA/8rJjZArU+pYWiVam3vMKXCMiotcqJ0=";
         x86_64-darwin = aarch64-darwin;
       }
       .${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
@@ -86,7 +96,9 @@ buildGoModule rec {
 
   disallowedRequisites = [ offlineCache ];
 
-  vendorHash = "sha256-m4Uu6cY9tT3Mn70xWqLz/8zom1koTL0uxyX/4Q5iBGY=";
+  postPatch = patchGoVersion;
+
+  vendorHash = "sha256-Pt87hb0+EuGd62ld65jTszeTy7GZZbviH8X9qCGOaJQ=";
 
   proxyVendor = true;
 
