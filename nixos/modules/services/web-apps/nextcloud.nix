@@ -337,6 +337,24 @@ in
   options.services.nextcloud = {
     enable = mkEnableOption "nextcloud";
 
+    disablePathSafetyCheck = mkOption {
+      default = false;
+      type = types.bool;
+      description = ''
+        By default, `nextcloud-setup` checks if `config` & `data` are owned
+        by the Nextcloud user.
+
+        If this is not the case, `systemd-tmpfiles` may refuse to create or update
+        `config.php` resulting in a subtly broken installation. See also
+        [](#module-services-nextcloud-pitfalls-during-upgrade) in the manual.
+
+        There's a check in place making sure this assumption is true, this option
+        turns off this check. This may be useful for exotic setup where
+        `data` is bind-mounted, readable by Nextcloud, but not owned by it.
+        Only turn this off if you know what you're doing.
+      '';
+    };
+
     hostName = mkOption {
       type = types.str;
       description = "FQDN for the nextcloud instance.";
