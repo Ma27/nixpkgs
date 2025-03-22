@@ -6,6 +6,7 @@
   nextcloud28Packages,
   nextcloud29Packages,
   nextcloud30Packages,
+  nextcloud31Packages,
 }:
 
 let
@@ -76,6 +77,13 @@ in
     hash = "sha256-uwhqES+zUW50SSHXrhSCzBvVN+39HxQFHBNI1LatWKI=";
     packages = nextcloud30Packages;
   };
+
+  nextcloud31 = generic {
+    version = "31.0.0";
+    hash = "sha256-b76weze7nPp8kb8bLfvPAxkFi25gSHweqht3frl2LZE=";
+    packages = nextcloud31Packages;
+  };
+
 
   # tip: get the sha with:
   # curl 'https://download.nextcloud.com/server/releases/nextcloud-${version}.tar.bz2.sha256'
