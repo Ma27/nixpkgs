@@ -20,22 +20,31 @@
 }:
 
 let
+  # Grafana seems to just set it to the latest version available
+  # nowadays.
+  # NOTE: sometimes, this is a no-op (i.e. `--replace-fail "X" "X"`).
+  # This is because Grafana raises the Go version above the patch-level we have
+  # on master if a security fix landed in Go (and our go may go through staging first).
+  #
+  # I(Ma27) decided to leave the code a no-op if this is not the case because
+  # pulling it out of the Git history every few months and checking which files
+  # we need to update now is slightly annoying.
   patchGoVersion = ''
     find . -name go.mod -not -path "./.bingo/*" -print0 | while IFS= read -r -d ''' line; do
       substituteInPlace "$line" \
-        --replace-fail "go 1.24.2" "go 1.23.6"
+        --replace-fail "go 1.23.7" "go 1.23.6"
     done
     find . -name go.work -print0 | while IFS= read -r -d ''' line; do
       substituteInPlace "$line" \
-        --replace-fail "go 1.24.2" "go 1.23.6"
+        --replace-fail "go 1.23.7" "go 1.23.6"
     done
     substituteInPlace Makefile \
-      --replace-fail "GO_VERSION = 1.24.2" "GO_VERSION = 1.23.7"
+      --replace-fail "GO_VERSION = 1.23.7" "GO_VERSION = 1.23.6"
   '';
 in
 buildGoModule rec {
   pname = "grafana";
-  version = "11.3.6";
+  version = "11.6.0";
 
   subPackages = [
     "pkg/cmd/grafana"
@@ -47,7 +56,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-OvK7OEiKgE9kfJCJt+LXklOfa0JWAv49rn1fnBDysQE=";
+    hash = "sha256-oXotHi79XBhxD/qYC7QDQwn7jiX0wKWe/RXZS5DwN9o=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
@@ -90,9 +99,9 @@ buildGoModule rec {
     outputHashMode = "recursive";
     outputHash =
       rec {
-        x86_64-linux = "sha256-KmrbfE4QQV/PBoR/SdNqSJxF01xqZFMI4dz1JZ+E4Kg=";
+        x86_64-linux = "sha256-52Sq7YJHhs0UICMOtEDta+bY7b/1SdNfzUOigQhH3E4=";
         aarch64-linux = x86_64-linux;
-        aarch64-darwin = "sha256-pfEf49Cvx9P74SIUqQj4emwX+VBYfa7+BXu+nL1kBc8=";
+        aarch64-darwin = "sha256-9AJbuA1WDGiln2ea0nqD9lDMhKWdYyVkgFyFLB6/Etc=";
         x86_64-darwin = aarch64-darwin;
       }
       .${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
@@ -102,7 +111,7 @@ buildGoModule rec {
 
   postPatch = patchGoVersion;
 
-  vendorHash = "sha256-yb2sNIkFL+PkxPUkzDP+rCqf59JGM8SxUySWa3Q3UTc=";
+  vendorHash = "sha256-cYE43OAagPHFhWsUJLMcJVfsJj6d0vUqzjbAviYSuSc=";
 
   proxyVendor = true;
 
