@@ -249,6 +249,16 @@
       "agpl"
     ]
   },
+  "oidc_login": {
+    "hash": "sha256-RLYquOE83xquzv+s38bahOixQ+y4UI6OxP9HfO26faI=",
+    "url": "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v3.2.2/oidc_login.tar.gz",
+    "version": "3.2.2",
+    "description": "# OpenID Connect Login\n\nProvides user creation and login via one single OpenID Connect provider. Even though this is a fork of [nextcloud-social-login](https://github.com/zorn-v/nextcloud-social-login), it fundamentally differs in two ways - aims for simplistic, single provider login (and hence is very minimalistic), and it supports having LDAP as the primary user backend. This way, you can use OpenID Connect to login to Nextcloud while maintaining an LDAP backend with attributes with the LDAP plugin.\n\n### Features\n\n- Automatic [Identity provider endpoints discovery](https://openid.net/specs/openid-connect-discovery-1_0.html)\n- User creation at first login\n- User profile update at login (name, email, avatar, groups etc.)\n- Group creation\n- Automatic redirection from the nextcloud login page to the Identity Provider login page\n- WebDAV endpoints `Bearer` and `Basic` authentication",
+    "homepage": "https://github.com/pulsejet/nextcloud-single-openid-connect",
+    "licenses": [
+      "agpl"
+    ]
+  },
   "onlyoffice": {
     "hash": "sha256-lOkVGOo2ylTaRVDFGD31DMUb3IbteWgFkHEj0Ox0D84=",
     "url": "https://github.com/ONLYOFFICE/onlyoffice-nextcloud/releases/download/v9.8.0/onlyoffice.tar.gz",
@@ -355,6 +365,16 @@
     "version": "0.16.1",
     "description": "Once enabled, a new Tasks menu will appear in your Nextcloud apps menu. From there you can add and delete tasks, edit their title, description, start and due dates and mark them as important. Tasks can be shared between users. Tasks can be synchronized using CalDav (each task list is linked to an Nextcloud calendar, to sync it to your local client: Thunderbird, Evolution, KDE Kontact, iCal … - just add the calendar as a remote calendar in your client). You can download your tasks as ICS files using the download button for each calendar.",
     "homepage": "https://github.com/nextcloud/tasks/",
+    "licenses": [
+      "agpl"
+    ]
+  },
+  "twofactor_admin": {
+    "hash": "sha256-zZvH7xfSooKBG4CKvSuf8D/6KnKEunLa+DRLAkWGoow=",
+    "url": "https://github.com/nextcloud-releases/twofactor_admin/releases/download/v4.8.0/twofactor_admin.tar.gz",
+    "version": "4.8.0",
+    "description": "This two-factor auth (2FA) provider for Nextcloud allows admins to generate a one-time\n\t\tcode for users to log into a 2FA protected account. This is helpful in situations where\n\t\tusers have lost access to their other 2FA methods or mandatory 2FA without any previously\n\t\tenabled 2FA provider.",
+    "homepage": "",
     "licenses": [
       "agpl"
     ]
