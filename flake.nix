@@ -243,6 +243,7 @@
                 "minecraft-server"
                 "spotify"
                 "spotify-unwrapped"
+                "youtrack"
               ];
             chromium.enableWideVine = true;
             permittedInsecurePackages = [
