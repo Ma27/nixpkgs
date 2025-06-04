@@ -242,6 +242,7 @@
                 "spotify"
                 "spotify-unwrapped"
                 "1password-cli"
+                "youtrack"
               ];
             chromium.enableWideVine = true;
             permittedInsecurePackages = [
