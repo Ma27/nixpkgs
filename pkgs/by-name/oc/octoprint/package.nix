@@ -166,11 +166,6 @@ let
             (replaceVars ./pip-path.patch {
               pip = "${self.pip}/bin/pip";
             })
-
-            # hardcore path to ffmpeg and hide related settings
-            (replaceVars ./ffmpeg-path.patch {
-              ffmpeg = "${pkgs.ffmpeg}/bin/ffmpeg";
-            })
           ];
 
           postPatch =
