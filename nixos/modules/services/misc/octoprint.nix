@@ -11,7 +11,6 @@ let
   baseConfig = {
     plugins.curalegacy.cura_engine = "${pkgs.curaengine_stable}/bin/CuraEngine";
     server.port = cfg.port;
-    webcam.ffmpeg = "${pkgs.ffmpeg.bin}/bin/ffmpeg";
   }
   // lib.optionalAttrs (cfg.host != null) { server.host = cfg.host; };
 
