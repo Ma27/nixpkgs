@@ -62,7 +62,10 @@ runTest (
               startAt = "20:00";
             };
             phpExtraExtensions = all: [ all.bz2 ];
+            secrets.mysecret = "/etc/nextcloud/mysecretfile";
           };
+
+          environment.etc."nextcloud/mysecretfile".text = "foobar";
 
           specialisation.withoutMagick.configuration = {
             services.nextcloud.enableImagemagick = false;
@@ -103,6 +106,9 @@ runTest (
 
         with subtest("Ensure SSE is disabled by default"):
             nextcloud.succeed("grep -vE '^HBEGIN:oc_encryption_module' /var/lib/nextcloud-data/data/root/files/test-shared-file")
+
+        with subtest("secrets"):
+            assert "foobar" == nextcloud.succeed("nextcloud-occ config:system:get mysecret").strip()
       '';
   }
 )
