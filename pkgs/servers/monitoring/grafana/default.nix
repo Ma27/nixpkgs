@@ -14,6 +14,7 @@
   nixosTests,
   xcbuild,
   faketty,
+  nodejs,
 }:
 
 let
@@ -28,19 +29,19 @@ let
   patchGoVersion = ''
     find . -name go.mod -not -path "./.bingo/*" -and -not -path "./devenv/*" -and -not -path "./hack/*" -and -not -path "./scripts/*" -print0 | while IFS= read -r -d ''' line; do
       substituteInPlace "$line" \
-        --replace-fail "go 1.24.5" "go 1.24.0"
+        --replace-fail "go 1.24.4" "go 1.24.0"
     done
     find . -name go.work -print0 | while IFS= read -r -d ''' line; do
       substituteInPlace "$line" \
-        --replace-fail "go 1.24.5" "go 1.24.0"
+        --replace-fail "go 1.24.4" "go 1.24.0"
     done
     substituteInPlace Makefile \
-      --replace-fail "GO_VERSION = 1.24.5" "GO_VERSION = 1.24.0"
+      --replace-fail "GO_VERSION = 1.24.4" "GO_VERSION = 1.24.0"
   '';
 in
 buildGoModule rec {
   pname = "grafana";
-  version = "12.0.3";
+  version = "12.1.0";
 
   subPackages = [
     "pkg/cmd/grafana"
@@ -52,12 +53,13 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-OSuezc8hehMyJuo3ldvsDf8tD+KvpUz5+MyzaLnUCGA=";
+    hash = "sha256-yraCuPLe68ryCgFzOZPL1H/JYynEvxijjgxMmQvcPZE=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
   env = {
     CYPRESS_INSTALL_BINARY = 0;
+    PUPPETEER_SKIP_DOWNLOAD = 1;
 
     # The build OOMs on memory constrained aarch64 without this
     NODE_OPTIONS = "--max_old_space_size=4096";
@@ -66,14 +68,14 @@ buildGoModule rec {
   missingHashes = ./missing-hashes.json;
   offlineCache = yarn-berry_4.fetchYarnBerryDeps {
     inherit src missingHashes;
-    hash = "sha256-ekqvMDEOwEqwrNnkpDqwJilXHr90XvmnbB+8wS3dbvY=";
+    hash = "sha256-+0L68wHR2nCp1g1PqyLIYatc+CIbvLqVUDa7CoyV/fo=";
   };
 
   disallowedRequisites = [ offlineCache ];
 
   postPatch = patchGoVersion;
 
-  vendorHash = "sha256-wF1/buOyD5+lZJF4s1OKpDiWXUFXD6j0pJ9RBFLff7Q=";
+  vendorHash = "sha256-a31jJN1NIHihFwbtBuLzV4lRKYWv8GtIHh6EwVMWdbM=";
 
   proxyVendor = true;
 
@@ -85,6 +87,7 @@ buildGoModule rec {
     # required to run old node-gyp
     (python3.withPackages (ps: [ ps.distutils ]))
     faketty
+    nodejs
     yarn-berry_4
     yarn-berry_4.yarnBerryConfigHook
   ]
