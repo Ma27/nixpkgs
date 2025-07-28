@@ -11,6 +11,7 @@ with lib;
 
 let
   inherit (utils) systemdUtils escapeSystemdPath;
+  inherit (systemdUtils.unitOptions) unitOption;
   inherit (systemdUtils.lib)
     generateUnits
     pathToUnit
@@ -21,6 +22,7 @@ let
     timerToUnit
     mountToUnit
     automountToUnit
+    attrsToSection
     ;
 
   cfg = config.boot.initrd.systemd;
@@ -179,6 +181,28 @@ in
       '';
     };
 
+    settings.Manager = mkOption {
+      default = { };
+      defaultText = lib.literalExpression ''
+        {
+          DefaultEnvironment = "PATH=/bin:/sbin";
+        }
+      '';
+      type = lib.types.submodule {
+        freeformType = types.attrsOf unitOption;
+      };
+      example = {
+        WatchdogDevice = "/dev/watchdog";
+        RuntimeWatchdogSec = "30s";
+        RebootWatchdogSec = "10min";
+        KExecWatchdogSec = "5min";
+      };
+      description = ''
+        Options for the global systemd service manager used in initrd. See {manpage}`systemd-system.conf(5)` man page
+        for available options.
+      '';
+    };
+
     managerEnvironment = mkOption {
       type =
         with types;
@@ -190,6 +214,11 @@ in
           ])
         );
       default = { };
+      defaultText = ''
+        {
+          PATH = "/bin:/sbin";
+        }
+      '';
       example = {
         SYSTEMD_LOG_LEVEL = "debug";
       };
@@ -466,6 +495,7 @@ in
           [Manager]
           DefaultEnvironment=PATH=/bin:/sbin
           ${cfg.extraConfig}
+          ${attrsToSection cfg.settings.Manager}
           ManagerEnvironment=${
             lib.concatStringsSep " " (
               lib.mapAttrsToList (n: v: "${n}=${lib.escapeShellArg v}") cfg.managerEnvironment
