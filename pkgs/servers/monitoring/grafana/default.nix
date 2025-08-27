@@ -27,21 +27,21 @@ let
   # stable is on an older patch-release of Go and then the build would fail
   # after a backport.
   patchGoVersion = ''
-    find . -name go.mod -not -path "./.bingo/*" -and -not -path "./devenv/*" -and -not -path "./hack/*" -and -not -path "./scripts/*" -print0 | while IFS= read -r -d ''' line; do
+    find . -name go.mod -not -path "./.bingo/*" -and -not -path "./hack/*" -and -not -path "./.citools/*" -print0 | while IFS= read -r -d ''' line; do
       substituteInPlace "$line" \
-        --replace-fail "go 1.24.4" "go 1.24.0"
+        --replace-fail "go 1.24.6" "go 1.24.0"
     done
     find . -name go.work -print0 | while IFS= read -r -d ''' line; do
       substituteInPlace "$line" \
-        --replace-fail "go 1.24.4" "go 1.24.0"
+        --replace-fail "go 1.24.6" "go 1.24.0"
     done
     substituteInPlace Makefile \
-      --replace-fail "GO_VERSION = 1.24.4" "GO_VERSION = 1.24.0"
+      --replace-fail "GO_VERSION = 1.24.6" "GO_VERSION = 1.24.0"
   '';
 in
 buildGoModule rec {
   pname = "grafana";
-  version = "12.1.0";
+  version = "12.1.1";
 
   subPackages = [
     "pkg/cmd/grafana"
@@ -53,7 +53,7 @@ buildGoModule rec {
     owner = "grafana";
     repo = "grafana";
     rev = "v${version}";
-    hash = "sha256-yraCuPLe68ryCgFzOZPL1H/JYynEvxijjgxMmQvcPZE=";
+    hash = "sha256-41OqvOTHlP66UtAecrpeArKldj0DNxK1oxTtQEihbo8=";
   };
 
   # borrowed from: https://github.com/NixOS/nixpkgs/blob/d70d9425f49f9aba3c49e2c389fe6d42bac8c5b0/pkgs/development/tools/analysis/snyk/default.nix#L20-L22
@@ -68,14 +68,14 @@ buildGoModule rec {
   missingHashes = ./missing-hashes.json;
   offlineCache = yarn-berry_4.fetchYarnBerryDeps {
     inherit src missingHashes;
-    hash = "sha256-+0L68wHR2nCp1g1PqyLIYatc+CIbvLqVUDa7CoyV/fo=";
+    hash = "sha256-51jCwnfWJoBICesM3SKiEvRC/Q1qUD310q59DucPdMs=";
   };
 
   disallowedRequisites = [ offlineCache ];
 
   postPatch = patchGoVersion;
 
-  vendorHash = "sha256-a31jJN1NIHihFwbtBuLzV4lRKYWv8GtIHh6EwVMWdbM=";
+  vendorHash = "sha256-9z3HqheXLNh3zfmp1A620vzzf5yZBUJsbj/cc6J+xTg=";
 
   proxyVendor = true;
 
