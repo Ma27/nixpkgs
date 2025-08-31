@@ -330,7 +330,7 @@ in
     };
 
     extraConfigFiles = mkOption {
-      type = types.listOf types.path;
+      type = types.listOf types.str;
       default = [ ];
       description = ''
         Extra config files to include.
