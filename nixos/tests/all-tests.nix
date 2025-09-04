@@ -1,5 +1,5 @@
 {
-  system,
+system,
   pkgs,
 
   # Projects the test configuration into a the desired value; usually
@@ -1458,6 +1458,7 @@ in
   velocity = runTest ./velocity.nix;
   vengi-tools = handleTest ./vengi-tools.nix { };
   victoriametrics = handleTest ./victoriametrics { };
+  victoriatraces = import ./victoriatraces { inherit runTest; };
   vikunja = handleTest ./vikunja.nix { };
   virtualbox = handleTestOn [ "x86_64-linux" ] ./virtualbox.nix { };
   vm-variant = handleTest ./vm-variant.nix { };
