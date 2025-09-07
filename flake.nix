@@ -240,6 +240,7 @@
                 "widevine-cdm"
                 "chromium-unwrapped"
                 "minecraft-server"
+                "obsidian"
                 "spotify"
                 "spotify-unwrapped"
                 "youtrack"
