@@ -227,6 +227,7 @@
                 "widevine-cdm"
                 "chromium-unwrapped"
                 "minecraft-server"
+                "obsidian"
                 "spotify"
                 "spotify-unwrapped"
                 "1password-cli"
