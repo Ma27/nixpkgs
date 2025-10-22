@@ -515,16 +515,16 @@ with SSH over vsock:
 bash# ssh -F ./ssh_config vsock/3
 ```
 
-For the AF_VSOCK feature to work, `/dev/vhost-vsock` is needed in the sandbox
-which can be done with e.g.
+This will halt the test execution on a test-failure and print instructions
+on how to enter the sandbox shell of the VM test. Inside, one can log into
+e.g. `machine` with
 
 ```
-nix-build -A nixosTests.foo --option sandbox-paths /dev/vhost-vsock
+ssh -F ./ssh_config -o User=root vsock-mux//tmp/.../machine_host.socket
 ```
 
-As described in [](#sec-nixos-test-ssh-access), the numbers for vsock start at
-`3` instead of `1`. So the first VM in the network (sorted alphabetically) can
-be accessed with `vsock/3`.
+The socket paths are printed at the beginning of the test. See
+[](#sec-nixos-test-ssh-access) for more context.
 
 ### SSH access to test containers {#sec-test-container-ssh-access}
 
