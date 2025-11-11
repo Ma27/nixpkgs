@@ -75,8 +75,7 @@ let
           inherit (config) test-helpers;
         in
         mkBefore ''
-          nextcloud.start()
-          client.start()
+          start_all()
           nextcloud.wait_for_unit("multi-user.target")
 
           ${test-helpers.init}
