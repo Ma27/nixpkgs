@@ -187,7 +187,7 @@ in
 
   ###### implementation
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && nixPackage.pname != "lix") {
     environment.systemPackages = [
       nixPackage
       pkgs.nix-info
