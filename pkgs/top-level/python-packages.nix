@@ -8948,6 +8948,10 @@ self: super: with self; {
 
   logbook = callPackage ../development/python-modules/logbook { };
 
+  logfire = callPackage ../development/python-modules/logfire { };
+
+  logfire-api = callPackage ../development/python-modules/logfire-api { };
+
   logfury = callPackage ../development/python-modules/logfury { };
 
   logging-journald = callPackage ../development/python-modules/logging-journald { };
