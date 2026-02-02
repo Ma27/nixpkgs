@@ -93,6 +93,8 @@ buildGoModule {
     command = ./update.sh;
   };
 
+  __darwinAllowLocalNetworking = true;
+
   meta = {
     description = "Email and SMTP testing tool with API for developers";
     homepage = "https://github.com/axllent/mailpit";
