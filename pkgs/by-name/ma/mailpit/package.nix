@@ -43,6 +43,9 @@ let
       hash = source.npmDepsHash;
     };
 
+    # error "C++20 or later required." for dependency node_modules/tree-sitter
+    env.NIX_CFLAGS_COMPILE = "-std=c++20";
+
     nativeBuildInputs = [
       nodejs
       python3
