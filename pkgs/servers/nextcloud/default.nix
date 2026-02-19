@@ -64,6 +64,12 @@ in
     packages = nextcloud32Packages;
   };
 
+  nextcloud33 = generic {
+    version = "33.0.0";
+    hash = "sha256-b3cwkCJpyHn58q1KoKInyxa1QI7kbwk/aL0yYz90Gr8=";
+    packages = nextcloud33Packages;
+  };
+
   # tip: get the sha with:
   # curl 'https://download.nextcloud.com/server/releases/nextcloud-${version}.tar.bz2.sha256'
 }
