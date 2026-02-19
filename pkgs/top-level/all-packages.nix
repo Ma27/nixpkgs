@@ -3461,6 +3461,7 @@ with pkgs;
   inherit (callPackages ../servers/nextcloud { })
     nextcloud31
     nextcloud32
+    nextcloud33
     ;
 
   nextcloud31Packages = callPackage ../servers/nextcloud/packages { ncVersion = "31"; };
