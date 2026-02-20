@@ -5,6 +5,7 @@
   nixosTests,
   nextcloud31Packages,
   nextcloud32Packages,
+  nextcloud33Packages,
 }:
 
 let
