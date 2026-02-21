@@ -244,6 +244,7 @@
                 "spotify-unwrapped"
                 "1password-cli"
                 "youtrack"
+                "terraform" # for coder :(
               ];
             chromium.enableWideVine = true;
             permittedInsecurePackages = [
