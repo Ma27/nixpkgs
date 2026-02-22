@@ -62,7 +62,7 @@ buildGoModule (final: {
   meta = {
     homepage = "https://getsops.io/";
     description = "Simple and flexible tool for managing secrets";
-    changelog = "https://github.com/getsops/sops/blob/v${final.version}/CHANGELOG.rst";
+    changelog = "https://github.com/getsops/sops/blob/v${final.version}/CHANGELOG.md";
     mainProgram = "sops";
     maintainers = with lib.maintainers; [
       Scrumplex
