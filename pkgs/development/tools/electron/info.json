@@ -4004,7 +4004,7 @@
         "version": "39.7.0"
     },
     "40": {
-        "chrome": "144.0.7559.177",
+        "chrome": "144.0.7559.220",
         "chromium": {
             "deps": {
                 "gn": {
@@ -4013,15 +4013,15 @@
                     "version": "0-unstable-2025-12-01"
                 }
             },
-            "version": "144.0.7559.177"
+            "version": "144.0.7559.220"
         },
         "chromium_npm_hash": "sha256-13sgV/5BD7QvDLBAEmoLN5vongw+S5v5znvZcctxhWc=",
         "deps": {
             "src": {
                 "args": {
-                    "hash": "sha256-dTlmKYKWyqOBqqwKEaziVlvGE7uFea3oTyM+lQgmVME=",
+                    "hash": "sha256-xhpHN17f2QmdgE9e7IQrjTmzhAjlnByQkWuuwwVOv4Y=",
                     "postFetch": "rm -rf $(find $out/third_party/blink/web_tests ! -name BUILD.gn -mindepth 1 -maxdepth 1); rm -r $out/content/test/data; rm -rf $out/courgette/testdata; rm -r $out/extensions/test/data; rm -r $out/media/test/data; ",
-                    "tag": "144.0.7559.177",
+                    "tag": "144.0.7559.220",
                     "url": "https://chromium.googlesource.com/chromium/src.git"
                 },
                 "fetcher": "fetchFromGitiles"
@@ -4060,10 +4060,10 @@
             },
             "src/electron": {
                 "args": {
-                    "hash": "sha256-K8ucr3C7TW8MZeqYKK/penpQF7Vd+hT67dneGng+/bA=",
+                    "hash": "sha256-CSkADthZGvO9akWZLwZinLtXhn9n2IIqlO+Z9mwMz/M=",
                     "owner": "electron",
                     "repo": "electron",
-                    "tag": "v40.6.0"
+                    "tag": "v40.6.1"
                 },
                 "fetcher": "fetchFromGitHub"
             },
@@ -4920,8 +4920,8 @@
             },
             "src/third_party/pdfium": {
                 "args": {
-                    "hash": "sha256-PX3jg11+zGfEIiOewgO4s9Knfw5a1shhFl8BZfioXng=",
-                    "rev": "66c6bc40966122935d37eef739deb988581214d4",
+                    "hash": "sha256-+0iNpsO+2NdPnFCnqEPAA70ymJo+IyB+MGLeBl6U9KE=",
+                    "rev": "53909bbc260e7bc9fe54f2e77bb0ad653dc345fe",
                     "url": "https://pdfium.googlesource.com/pdfium.git"
                 },
                 "fetcher": "fetchFromGitiles"
@@ -5339,8 +5339,8 @@
             },
             "src/v8": {
                 "args": {
-                    "hash": "sha256-7jQ1WrY2+8s0tDjl4qzaZz/xdWrePiVvuJDI00YLd9k=",
-                    "rev": "0f9ccaeb4a88dbff7a7c86e998ceea7d6f947950",
+                    "hash": "sha256-KfnEtvzb7S6aMxj+5fiES/+jvAwfOTi4pQ48tbK7ObA=",
+                    "rev": "3d1baf826e1286e35d04e9991ba0a669e26d25a3",
                     "url": "https://chromium.googlesource.com/v8/v8.git"
                 },
                 "fetcher": "fetchFromGitiles"
@@ -5349,6 +5349,6 @@
         "electron_yarn_hash": "sha256-+7UFFBC4awv3Eg7aB5fKgIysAA2QIpds7s7xN2DuoP8=",
         "modules": "143",
         "node": "24.13.1",
-        "version": "40.6.0"
+        "version": "40.6.1"
     }
 }
