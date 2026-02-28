@@ -19,6 +19,7 @@
 , "forms": "agpl3Plus"
 , "gpoddersync": "agpl3Only"
 , "groupfolders": "agpl3Plus"
+, "guests": "agpl3Plus"
 , "impersonate": "agpl3Plus"
 , "integration_deepl": "agpl3Plus"
 , "integration_openai": "agpl3Only"

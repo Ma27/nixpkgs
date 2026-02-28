@@ -159,6 +159,16 @@
       "agpl"
     ]
   },
+  "guests": {
+    "hash": "sha256-P0RToE38jA/dB/B3N3q9RFlZlH1earzDMc7q0qp8tjM=",
+    "url": "https://github.com/nextcloud-releases/guests/releases/download/v4.6.0/guests-v4.6.0.tar.gz",
+    "version": "4.6.0",
+    "description": "👥 Allows for better collaboration with external users by allowing users to create guests account.\n\nGuests accounts can be created from the share menu by entering either the recipients email or name and choosing \"create guest account\", once the share is created the guest user will receive an email notification about the mail with a link to set their password.\n\nGuests users can only access files shared to them and cannot create any files outside of shares, additionally, the apps accessible to guest accounts are whitelisted.",
+    "homepage": "https://github.com/nextcloud/guests/",
+    "licenses": [
+      "agpl"
+    ]
+  },
   "impersonate": {
     "hash": "sha256-mOlaUYaGRoYITwjIpwhUnKLh9HOVef77dCpFP4bC5RQ=",
     "url": "https://github.com/nextcloud-releases/impersonate/releases/download/v3.0.1/impersonate-v3.0.1.tar.gz",
