@@ -57,6 +57,7 @@ in
     version = "31.0.14";
     hash = "sha256-0JZessv2gQV0PLvm7vQEyJCSz5LEDa7iycuc9u32NhM=";
     packages = nextcloud31Packages;
+    eol = true;
   };
 
   nextcloud32 = generic {
