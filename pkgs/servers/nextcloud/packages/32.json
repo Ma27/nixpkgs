@@ -109,6 +109,16 @@
       "agpl"
     ]
   },
+  "files_linkeditor": {
+    "hash": "sha256-KCrCtciMc2CfTK2AbjWGgwK35/8H0MZmV8ay7BtOHYI=",
+    "url": "https://github.com/te-online/nextcloud-app-releases/raw/main/files_linkeditor/v1.1.23/files_linkeditor.tar.gz",
+    "version": "1.1.23",
+    "description": "### External web links in Nextcloud!\n* ✍️ **create and edit** .URL and .webloc links in the file view\n* 🌍 **open links** by clicking them and confirming you want to go to the external site\n* 📤 **works in public shares** so you can share links easily with others\n* 🔄 **sync your links** as .URL and .webloc are web links as created on most operating systems.\n\n_[View changelog](https://github.com/te-online/files_linkeditor/blob/main/CHANGELOG.md)_",
+    "homepage": "https://github.com/te-online/files_linkeditor",
+    "licenses": [
+      "agpl"
+    ]
+  },
   "files_retention": {
     "hash": "sha256-48fC7VDNZs2+qienMP5hBAWgRkm/i+Q2WXnrd8fz16Q=",
     "url": "https://github.com/nextcloud-releases/files_retention/releases/download/v3.0.0/files_retention-v3.0.0.tar.gz",
