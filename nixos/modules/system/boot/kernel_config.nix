@@ -76,7 +76,12 @@ let
       "\"\""
     else if val == "y" || val == "m" || val == "n" then
       val
-    else if all isNumber (stringToCharacters val) then
+    else if
+      let
+        chars = stringToCharacters val;
+      in
+      all isNumber chars || hasPrefix "-" val && all isNumber (tail chars)
+    then
       val
     else if substring 0 2 val == "0x" then
       val
