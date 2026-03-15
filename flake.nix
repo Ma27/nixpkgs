@@ -245,6 +245,7 @@
                 "spotify-unwrapped"
                 "youtrack"
                 "terraform" # for coder :(
+                "samsung-unified-linux-driver"
               ];
             chromium.enableWideVine = true;
             permittedInsecurePackages = [
