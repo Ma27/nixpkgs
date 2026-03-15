@@ -85,8 +85,33 @@ let
       val
     else if substring 0 2 val == "0x" then
       val
+    else if hasPrefix ''"'' val then
+      val
     else
-      val; # FIXME: fix quoting one day
+      ''"${val}"''; # FIXME: fix quoting one day
+
+  generateDotConfig =
+    settings:
+    let
+      mkItem =
+        k:
+        {
+          freeform ? null,
+          tristate ? null,
+          ...
+        }:
+        let
+          effective = if freeform == null then tristate else freeform;
+        in
+        lib.nameValuePair "CONFIG_${k}" (if effective == null then null else mkValue effective);
+      prepared = mapAttrs' mkItem settings;
+    in
+    {
+      configStrings = lib.filterAttrs (_: v: v != null) prepared;
+      configFile = concatStringsSep "\n" (
+        mapAttrsToList (k: v: if v == null then "# CONFIG_${k} is unset" else "${k}=${v}") prepared
+      );
+    };
 
   # generate nix intermediate kernel config file of the form
   #
@@ -134,6 +159,32 @@ in
       '';
     };
 
+    configFile = mkOption {
+      readOnly = true;
+      type = types.lines;
+      example = ''
+        CONFIG_USB=y
+        CONFIG_DEBUG=n
+      '';
+      description = ''
+        Structured kernel configuration as `.config` format.
+      '';
+    };
+
+    configStrings = mkOption {
+      readOnly = true;
+      type = types.attrsOf types.str;
+      example = lib.literalExpression ''
+        {
+          CONFIG_USB = "y";
+          CONFIG_DEBUG = "n";
+        }
+      '';
+      description = ''
+        Structured kernel configuration in the format for `build.nix`.
+      '';
+    };
+
     settings = mkOption {
       type = types.attrsOf kernelItem;
       example = literalExpression ''
@@ -150,5 +201,6 @@ in
 
   config = {
     intermediateNixConfig = generateNixKConf config.settings;
+    inherit (generateDotConfig config.settings) configFile configStrings;
   };
 }

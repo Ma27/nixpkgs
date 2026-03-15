@@ -89,6 +89,8 @@ let
 
       linux_testing
       ;
+
+    kconfig-ng = patchedPkgs.linuxPackagesFor patchedPkgs.linuxKernel.kconfig-ng;
   };
 
 in
