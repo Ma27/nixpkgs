@@ -9,6 +9,7 @@
   #
   # We use the unwrapped compiler, because the clang-wrapper doesn't like -target.
   "CC=${lib.getExe stdenv.cc.cc}"
+  "GCC=${lib.getExe stdenv.cc.cc}"
   # The wrapper for ld.lld breaks linking the kernel. We use the unwrapped linker as workaround. See:
   # https://github.com/NixOS/nixpkgs/issues/321667
   "LD=${lib.getExe' stdenv.cc.bintools.bintools "${stdenv.cc.targetPrefix}ld"}"

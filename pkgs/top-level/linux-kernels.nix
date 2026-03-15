@@ -31,6 +31,8 @@ in
 {
   kernelPatches = callPackage ../os-specific/linux/kernel/patches.nix { };
 
+  kconfig-ng = callPackage ../os-specific/linux/kernel/kconfig-ng {};
+
   kernels = recurseIntoAttrs (
     lib.makeExtensible (
       self:
