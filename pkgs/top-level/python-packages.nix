@@ -5877,6 +5877,8 @@ self: super: with self; {
     }
   );
 
+  genai-prices = callPackage ../development/python-modules/genai-prices { };
+
   genanki = callPackage ../development/python-modules/genanki { };
 
   generic = callPackage ../development/python-modules/generic { };
