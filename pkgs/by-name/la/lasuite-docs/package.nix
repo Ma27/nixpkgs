@@ -10,7 +10,6 @@
   yarnConfigHook,
 }:
 let
-  version = "4.5.0";
   python = python3.override {
     self = python3;
     packageOverrides = self: super: {
@@ -19,11 +18,12 @@ let
   };
   python3Packages = python.pkgs;
 
+  version = "4.8.1";
   src = fetchFromGitHub {
     owner = "suitenumerique";
     repo = "docs";
     tag = "v${version}";
-    hash = "sha256-/mI11ldbYa051WA2hkV7fnc8CJOb0jHra0FJ+eVCqVs=";
+    hash = "sha256-R8DO7hsWt8+aKnHFEoZ06f1f+r8dNmNoPZRVBfr9VCY=";
   };
 
   mail-templates = stdenv.mkDerivation {
@@ -36,7 +36,7 @@ let
 
     offlineCache = fetchYarnDeps {
       yarnLock = "${src}/src/mail/yarn.lock";
-      hash = "sha256-g71OGg0PAo60h0bC+oOyvLvPOCg0pYXuYD8vsR5X9/k=";
+      hash = "sha256-ag9+g48dWl5Ww/78qqgtcKwiyPVlpNiJ7w7+DPaar2U=";
     };
 
     nativeBuildInputs = [
@@ -111,12 +111,14 @@ python3Packages.buildPythonApplication rec {
       openai
       psycopg
       pycrdt
+      pydantic-ai-slim
       pyjwt
       pyopenssl
       python-magic
       redis
       requests
       sentry-sdk
+      uvicorn
       whitenoise
     ]
     ++ celery.optional-dependencies.redis
