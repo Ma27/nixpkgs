@@ -18,12 +18,13 @@ let
   };
   python3Packages = python.pkgs;
 
-  version = "4.8.1";
+  version = "4.8.4";
+
   src = fetchFromGitHub {
     owner = "suitenumerique";
     repo = "docs";
     tag = "v${version}";
-    hash = "sha256-R8DO7hsWt8+aKnHFEoZ06f1f+r8dNmNoPZRVBfr9VCY=";
+    hash = "sha256-k90JxFxXL3vEGBMkgbQABUCK99utJ88E/v9Zcj/2oBo=";
   };
 
   mail-templates = stdenv.mkDerivation {
@@ -36,7 +37,7 @@ let
 
     offlineCache = fetchYarnDeps {
       yarnLock = "${src}/src/mail/yarn.lock";
-      hash = "sha256-ag9+g48dWl5Ww/78qqgtcKwiyPVlpNiJ7w7+DPaar2U=";
+      hash = "sha256-Fd9HJ7c7fh8YYZrfzRK7BnlnHAXeyeQ9UBabnRlA+w0=";
     };
 
     nativeBuildInputs = [
@@ -95,6 +96,7 @@ python3Packages.buildPythonApplication rec {
       django-storages
       django-timezone-field
       django-treebeard
+      django-waffle
       djangorestframework
       drf-spectacular
       drf-spectacular-sidecar
@@ -129,7 +131,7 @@ python3Packages.buildPythonApplication rec {
 
   postBuild = ''
     export DATA_DIR=$(pwd)/data
-    ${python3.pythonOnBuildForHost.interpreter} manage.py collectstatic --no-input --clear
+    ${python.pythonOnBuildForHost.interpreter} manage.py collectstatic --no-input --clear
   '';
 
   postInstall =
@@ -146,12 +148,13 @@ python3Packages.buildPythonApplication rec {
       makeWrapper $out/bin/.manage.py $out/bin/docs \
         --prefix PYTHONPATH : "${pythonPath}"
       makeWrapper ${lib.getExe python3Packages.celery} $out/bin/celery \
-        --prefix PYTHONPATH : "${pythonPath}:$out/${python3.sitePackages}"
+        --prefix PYTHONPATH : "${pythonPath}:$out/${python.sitePackages}"
       makeWrapper ${lib.getExe python3Packages.gunicorn} $out/bin/gunicorn \
-        --prefix PYTHONPATH : "${pythonPath}:$out/${python3.sitePackages}"
+        --prefix PYTHONPATH : "${pythonPath}:$out/${python.sitePackages}"
 
       mkdir -p $out/${python.sitePackages}/core/templates
       ln -sv ${mail-templates}/ $out/${python.sitePackages}/core/templates/mail
+      cp -r impress/configuration $out/${python.sitePackages}/impress/configuration
     '';
 
   passthru.tests = {
