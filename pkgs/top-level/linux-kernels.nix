@@ -206,6 +206,14 @@ in
           ];
         };
 
+        linux_7_0 = callPackage ../os-specific/linux/kernel/mainline.nix {
+          branch = "7.0";
+          kernelPatches = [
+            kernelPatches.bridge_stp_helper
+            kernelPatches.request_key_helper
+          ];
+        };
+
         linux_testing =
           let
             testing = callPackage ../os-specific/linux/kernel/mainline.nix {
@@ -722,7 +730,7 @@ in
     linux_6_1 = recurseIntoAttrs (packagesFor kernels.linux_6_1);
     linux_6_6 = recurseIntoAttrs (packagesFor kernels.linux_6_6);
     linux_6_12 = recurseIntoAttrs (packagesFor kernels.linux_6_12);
-    linux_6_17 = recurseIntoAttrs (packagesFor kernels.linux_6_17);
+    linux_7_0 = recurseIntoAttrs (packagesFor kernels.linux_7_0);
   }
   // lib.optionalAttrs config.allowAliases {
     linux_4_19 = throw "linux 4.19 was removed because it will reach its end of life within 24.11"; # Added 2024-09-21
@@ -797,9 +805,7 @@ in
   packageAliases = {
     linux_default = packages.linux_6_12;
     # Update this when adding the newest kernel major version!
-    linux_latest = packages.linux_6_17;
-    linux_rt_default = packages.linux_rt_5_15;
-    linux_rt_latest = packages.linux_rt_6_6;
+    linux_latest = packages.linux_7_0;
   }
   // lib.optionalAttrs config.allowAliases {
     linux_mptcp = throw "'linux_mptcp' has been moved to https://github.com/teto/mptcp-flake";
