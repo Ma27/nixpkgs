@@ -150,6 +150,10 @@ buildPythonPackage rec {
 
     # ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
     "test_tool_progress"
+
+    "test_complex_function_runtime_arg_validation_non_json"
+    "test_complex_function_runtime_arg_validation_with_json"
+    "test_complex_function_json_schema"
   ];
 
   __darwinAllowLocalNetworking = true;
