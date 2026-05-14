@@ -18,12 +18,12 @@ let
   };
   python3Packages = python.pkgs;
 
-  version = "5.0.0";
+  version = "5.1.0";
   src = fetchFromGitHub {
     owner = "suitenumerique";
     repo = "docs";
     tag = "v${version}";
-    hash = "sha256-yjcnXC46C2Z453oN4/fJc2q+B0yQKL3jKaIIpRlzu5s=";
+    hash = "sha256-Ptg3C+5DbUiWVS8nMCmqmSFMmNI4NW8NYBF+G5xOqSg=";
   };
 
   mail-templates = stdenv.mkDerivation {
@@ -36,7 +36,7 @@ let
 
     offlineCache = fetchYarnDeps {
       yarnLock = "${src}/src/mail/yarn.lock";
-      hash = "sha256-g5MYtHvs0i0AOAydMxJNx1xTwbZtXS0CYDNQC+cnIOM=";
+      hash = "sha256-CKKGY87C5ifv0sHm9ExCzaGM3mV4C0NsWLCbw+ALqGc=";
     };
 
     nativeBuildInputs = [
@@ -62,6 +62,9 @@ python3Packages.buildPythonApplication rec {
 
     # Fix creation of unsafe C function in postgresql migrations
     ./postgresql_fix.patch
+
+    # Fix installing all modules with uv_build
+    ./uv.patch
   ];
 
   # They use a old version of mistralai which exported a class
@@ -71,6 +74,9 @@ python3Packages.buildPythonApplication rec {
       --replace-fail \
         "from mistralai import Mistral" \
         "from mistralai.client import Mistral"
+
+    substituteInPlace pyproject.toml \
+      --replace-fail "uv_build>=0.11.9,<0.12" "uv_build"
   ''
   # Otherwise fails with:
   # socket.gaierror: [Errno 8] nodename nor servname provided, or not known
@@ -82,7 +88,7 @@ python3Packages.buildPythonApplication rec {
   '';
   __darwinAllowLocalNetworking = true;
 
-  build-system = with python3Packages; [ setuptools ];
+  build-system = with python3Packages; [ uv-build ];
 
   dependencies =
     with python3Packages;
