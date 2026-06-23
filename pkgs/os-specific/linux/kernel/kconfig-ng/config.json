@@ -1,0 +1,440 @@
+{
+  "declarations": {
+    "BLK_DEV": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "AF_UNIX_OOB": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "INET_RAW_DIAG": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "PKEY_UV": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CGROUP_RDMA": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "HAMRADIO": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "UCLAMP_TASK_GROUP": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_SL3516": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CGROUP_FREEZER": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NETDEVICES": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MEMCG_V1": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NET_FOU": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "NET_9P": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "NETCONSOLE": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "INET": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "CRYPTO_PHMAC_S390": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "ROSE": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "RT_GROUP_SCHED_DEFAULT_DISABLED": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_FSL_CAAM": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CGROUP_DMEM": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "S390_PRNG": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "PKEY_PCKMO": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "ACPI_FPDT": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "RT_GROUP_SCHED": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_FSL_DPAA2_CAAM": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "NET_9P_FD": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "VIRTIO_PCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "USB": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "9P_FS_SECURITY": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_TALITOS": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "NET_9P_VIRTIO": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "UBIFS_FS_ZLIB": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "WQ_POWER_EFFICIENT_DEFAULT": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "SQUASHFS": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "BLK_DEV_INITRD": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "INITRAMFS_COMPRESSION_GZIP": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "VIRTIO_NET": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CAN": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "DAX": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MODULE_COMPRESS": {
+      "tristate": "n",
+      "src": "FromConfig"
+    },
+    "FAIR_GROUP_SCHED": {
+      "tristate": "n",
+      "src": "FromConfig"
+    },
+    "UNIX_DIAG": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "CRYPTO_DEV_FSL_CAAM_JR": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "PCI_MESON": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CRYPTO_PAES_S390": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "NETROM": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "RUST": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MEMCG": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "USB_HID": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "SERIAL_8250_CONSOLE": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "PROC_PID_CPUSET": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "PCI": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "TCP_CONG_ADVANCED": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "MODULE_DEBUG": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUP_PIDS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MODULE_STATS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUPS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MODULES": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NET_CORE": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_FSL_CAAM_PRNG_API": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "9P_FS_POSIX_ACL": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "INET_DIAG": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "PM_AUTOSLEEP": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CPUSETS_V1": {
+      "tristate": "n",
+      "src": "FromConfig"
+    },
+    "CFS_BANDWIDTH": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "ACPI_DOCK": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "PKEY_CCA": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "BLK_CGROUP_IOPRIO": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "VIRTIO_BALLOON": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_TALITOS1": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CPUSETS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "BLK_CGROUP": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUP_HUGETLB": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "TMPFS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_FSL_CAAM_INTC": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "ACPI_TAD": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "INET_DIAG_DESTROY": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "VIRTIO_BLK": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "VIRTIO": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "BLK_DEV_DM": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "SND_VIRTIO": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CRYPTO_RNG_DEFAULT": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NET": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "UBIFS_FS_LZO": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "VIRTIO_CONSOLE": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_FSL_CAAM_RNG_TEST": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_FSL_CAAM_DEBUG": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "SERIAL_8250": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "NETWORK_FILESYSTEMS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MODULE_DECOMPRESS": {
+      "tristate": "n",
+      "src": "FromConfig"
+    },
+    "PKEY_EP11": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "DEVTMPFS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "EXT4_FS": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CGROUP_SCHED": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_FSL_CAAM_RNG_API": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "UNIX": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "SYSVIPC": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MD": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "9P_FSCACHE": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "UBIFS_FS_ZSTD": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "AX25": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_SL3516_DEBUG": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "OVERLAY_FS": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "9P_FS": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "CRYPTO_DEV_HIFN_795X_RNG": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "INET_UDP_DIAG": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "CRYPTO_DEV_FSL_CAAM_PKC_API": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "IP_MULTICAST": {
+      "tristate": "y",
+      "src": "User"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "RUST": {
+    "tristate": "n",
+    "src": "User"
+  },
+  "LTO": {
+    "tristate": "y",
+    "src": "User"
+  },
+  "LTO_CLANG_FULL": {
+    "tristate": "y",
+    "src": "User"
+  }
+}

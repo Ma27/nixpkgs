@@ -532,10 +532,10 @@ in
 
     boot.initrd.availableKernelModules = [
       # systemd needs this for some features
-      "autofs"
+      #"autofs"
       # systemd-cryptenroll
-    ]
-    ++ lib.optional cfg.package.withEfi "efivarfs";
+    ];
+    #++ lib.optional cfg.package.withEfi "efivarfs";
 
     boot.kernelParams =
       lib.optional (config.boot.initrd.systemd.root != null) "root=${config.boot.initrd.systemd.root}"
