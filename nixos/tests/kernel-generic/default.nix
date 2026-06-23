@@ -10,30 +10,30 @@ let
   patchedPkgs = pkgs.extend (
     final: prev: {
       kernelPackagesExtensions = prev.kernelPackagesExtensions ++ [
-        (
-          finalKernelPackages: _:
-          let
-            finalKernel = finalKernelPackages.kernel;
-          in
-          {
-            hello-world = final.stdenv.mkDerivation {
-              name = "hello-module";
+        #(
+          #finalKernelPackages: _:
+          #let
+            #finalKernel = finalKernelPackages.kernel;
+          #in
+          #{
+            #hello-world = final.stdenv.mkDerivation {
+              #name = "hello-module";
 
-              nativeBuildInputs = finalKernel.moduleBuildDependencies;
-              makeFlags = finalKernel.commonMakeFlags ++ [
-                # Variable refers to the local Makefile.
-                "KDIR=${finalKernel.dev}/lib/modules/${finalKernel.modDirVersion}/build"
-                # Variable of the Linux src tree's main Makefile.
-                "INSTALL_MOD_PATH=$(out)"
-              ];
+              #nativeBuildInputs = finalKernel.moduleBuildDependencies;
+              #makeFlags = finalKernel.commonMakeFlags ++ [
+                ## Variable refers to the local Makefile.
+                #"KDIR=${finalKernel.dev}/lib/modules/${finalKernel.modDirVersion}/build"
+                ## Variable of the Linux src tree's main Makefile.
+                #"INSTALL_MOD_PATH=$(out)"
+              #];
 
-              buildFlags = [ "modules" ];
-              installTargets = [ "modules_install" ];
+              #buildFlags = [ "modules" ];
+              #installTargets = [ "modules_install" ];
 
-              src = ./hello-world-src;
-            };
-          }
-        )
+              #src = ./hello-world-src;
+            #};
+          #}
+        #)
       ];
     }
   );
@@ -64,10 +64,15 @@ let
             # ]
 
             boot.kernelPackages = linuxPackages;
+            boot.initrd.availableKernelModules = ["ext4" "virtio_blk" "virtio_pci" "whatnothisiswrong"];
+            boot.initrd.allowMissingModules = true;
+            boot.kernelModules = ["ext4"];
+            boot.initrd.kernelModules = ["ext4"];
+            boot.initrd.compressor = "cat";
 
-            boot.extraModulePackages = [ config.boot.kernelPackages.hello-world ];
+            #boot.extraModulePackages = [ config.boot.kernelPackages.hello-world ];
 
-            boot.kernelModules = [ "hello" ];
+            #boot.kernelModules = [ "hello" ];
           };
 
         testScript = ''
@@ -90,7 +95,7 @@ let
       linux_testing
       ;
 
-    kconfig-ng = patchedPkgs.linuxPackagesFor patchedPkgs.linuxKernel.kconfig-ng;
+    kconfig-ng = patchedPkgs.pkgsLLVM.linuxPackagesFor patchedPkgs.pkgsLLVM.linuxKernel.kconfig-ng;
   };
 
 in

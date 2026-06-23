@@ -164,8 +164,8 @@ lib.makeOverridable (
       }
       // config_;
 
-    isModular = config.isYes "MODULES";
-    withRust = config.isYes "RUST";
+    isModular = true; #config.isYes "MODULES";
+    withRust = false; #config.isYes "RUST";
 
     target = stdenv.hostPlatform.linux-kernel.target or "vmlinux";
 
@@ -342,7 +342,7 @@ lib.makeOverridable (
 
     configurePhase = ''
       runHook preConfigure
-
+      set -x
       mkdir build
       export buildRoot="$(pwd)/build"
 
@@ -356,7 +356,7 @@ lib.makeOverridable (
 
       # reads the existing .config file and prompts the user for options in
       # the current kernel source that are not found in the file.
-      make "''${makeFlags[@]}" oldconfig
+      #make "''${makeFlags[@]}" oldconfig
       runHook postConfigure
 
       make "''${makeFlags[@]}" prepare
