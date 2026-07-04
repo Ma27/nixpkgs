@@ -18,7 +18,7 @@
   features ? { },
   kernelPatches ? [ ],
   randstructSeed ? null,
-  linuxKernel
+  linuxKernel,
 }:
 
 let
@@ -26,43 +26,38 @@ let
   #data = builtins.fromJSON (builtins.readFile input);
 
   # FIXME maybe even a scope? All the on-demand callPackage sucks!
-  flags = callPackage ../common-flags.nix { };
-
-  defaultsFromROKC =
-    with lib.kernel;
-    lib.mkMerge [
-      #(lib.genAttrs' data.deferred (
-        #name: lib.nameValuePair name (lib.mkOptionDefault (throw "${name} must be set by the Nix code!"))
-      #))
-      (lib.genAttrs' data.unset (name: lib.nameValuePair name (lib.mkOptionDefault unset)))
-      (lib.mapAttrs (lib.const lib.mkOptionDefault) data.declarations)
-    ];
+  flags = builtins.removeAttrs (callPackage ../common-flags.nix { }) [
+    "__functor"
+    "override"
+    "overrideDerivation"
+  ];
 
   #inherit
-    #(lib.evalModules {
-      #modules = [
-        #../../../../../nixos/modules/system/boot/kernel_config.nix
-        #{
-          #settings = defaultsFromROKC;
-          #_file = "rokc defaults from ${toString input}";
-        #}
-        #{
-          #settings = callPackage ./nix-overrides.nix { inherit version; };
-          #_file = toString ./nix-overrides.nix;
-        #}
-      #];
-    #})
-    #config
-    #;
+  #(lib.evalModules {
+  #modules = [
+  #../../../../../nixos/modules/system/boot/kernel_config.nix
+  #{
+  #settings = defaultsFromROKC;
+  #_file = "rokc defaults from ${toString input}";
+  #}
+  #{
+  #settings = callPackage ./nix-overrides.nix { inherit version; };
+  #_file = toString ./nix-overrides.nix;
+  #}
+  #];
+  #})
+  #config
+  #;
 
   configfile = stdenv.mkDerivation (finalAttrs: {
     pname = "linux-.config";
     inherit version;
     __structuredAttrs = true;
+    inherit (linux) src;
     #configData = config.configFile;
     #passthru = {
-      #configModule = config;
-      #config = config.settings;
+    #configModule = config;
+    #config = config.settings;
     #};
     preferLocalBuild = true;
     nativeBuildInputs = [
@@ -72,32 +67,21 @@ let
       breakpointHook
       #rokc
     ];
-    # FIXME we need a better input format for the flags!
-    env =
-      lib.genAttrs' flags (
-        line:
-        let
-          data = lib.splitString "=" line;
-        in
-        lib.nameValuePair (builtins.unsafeDiscardStringContext (lib.head data)) (lib.last data)
-      )
-      // {
-        SRCARCH = "x86";
-        KERNELVERSION = version;
-        srctree = "."; # FIXME ACH GEHT DOCH SCHEIẞEN
-        PAHOLE = "${lib.getExe pahole}";
-        CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
-      };
-    buildCommand = ''
-      source "$NIX_ATTRS_SH_FILE"
-      <"$NIX_ATTRS_JSON_FILE" jq -r .configData >$out
-      unpackFile ${linux.src}
-
-      pushd linux-7.0.9 &>/dev/null
-        env RUST_BACKTRACE=1 /tmp/rokcnix complete -k Kconfig -i ${input} -o $out ${overrides}
-        cat $out
-        /tmp/rokc -q check "$out" Kconfig
-      popd &>/dev/null
+    env = flags // {
+      SRCARCH = "x86";
+      KERNELVERSION = version;
+      PAHOLE = "${lib.getExe pahole}";
+      CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
+    };
+    postUnpack = ''
+      export srctree="$(realpath "$sourceRoot")"
+    '';
+    dontBuild = true;
+    dontConfigure = true;
+    installPhase = ''
+      env RUST_BACKTRACE=1 /tmp/rokcnix complete -k Kconfig -i ${input} -o $out ${overrides}
+      cat $out
+      /tmp/rokc -q check "$out" Kconfig
     '';
   });
 in
@@ -112,10 +96,11 @@ in
     configfile
     #modDirVersion
     ;
-    #allowImportFromDerivation = true;
+  #allowImportFromDerivation = true;
   #config = config;
   modDirVersion = "7.0.9";
   #pos = builtins.unsafeGetAttrPos "version" args;
-} // {
+}
+// {
   #data = builtins.toFile ".config" config.configFile;
 }

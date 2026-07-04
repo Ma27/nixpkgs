@@ -119,11 +119,12 @@ lib.makeOverridable (
       ;
 
     commonMakeFlags = import ./common-flags.nix {
+      extraMakeFlags = assert extraMakeFlags == []; {}; # FIXME stop-gap to keep eval working!
       inherit
         lib
         stdenv
         buildPackages
-        extraMakeFlags
+        #extraMakeFlags
         ;
     };
 
@@ -284,7 +285,7 @@ lib.makeOverridable (
       # kernel’s definition creates a new, unexported variable.
       "--eval=undefine modules"
     ]
-    ++ commonMakeFlags;
+    ++ lib.mapAttrsToList (k: v: "${k}=${v}") commonMakeFlags;
 
     postPatch = ''
       # Ensure that depmod gets resolved through PATH
