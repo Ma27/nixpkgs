@@ -19,11 +19,21 @@
   kernelPatches ? [ ],
   randstructSeed ? null,
   linuxKernel,
+
+  /*
+    TODO
+    reenable modules
+    no hard-coded version
+    rokc pkg
+    requiredKernelConfig
+    overrides-in-nix
+    no dumb overrides in this file
+    ensure convergence.
+  */
 }:
 
 let
   linux = linuxKernel.kernels.linux_7_0;
-  #data = builtins.fromJSON (builtins.readFile input);
 
   # FIXME maybe even a scope? All the on-demand callPackage sucks!
   flags = builtins.removeAttrs (callPackage ../common-flags.nix { }) [
@@ -32,33 +42,11 @@ let
     "overrideDerivation"
   ];
 
-  #inherit
-  #(lib.evalModules {
-  #modules = [
-  #../../../../../nixos/modules/system/boot/kernel_config.nix
-  #{
-  #settings = defaultsFromROKC;
-  #_file = "rokc defaults from ${toString input}";
-  #}
-  #{
-  #settings = callPackage ./nix-overrides.nix { inherit version; };
-  #_file = toString ./nix-overrides.nix;
-  #}
-  #];
-  #})
-  #config
-  #;
-
   configfile = stdenv.mkDerivation (finalAttrs: {
     pname = "linux-.config";
     inherit version;
     __structuredAttrs = true;
     inherit (linux) src;
-    #configData = config.configFile;
-    #passthru = {
-    #configModule = config;
-    #config = config.settings;
-    #};
     preferLocalBuild = true;
     nativeBuildInputs = [
       jq
@@ -66,6 +54,7 @@ let
       binutils
       breakpointHook
       #rokc
+      (import ~/Projects/nix-module-system-kernel/rokc/build.nix)
     ];
     env = flags // {
       SRCARCH = "x86";
@@ -79,9 +68,9 @@ let
     dontBuild = true;
     dontConfigure = true;
     installPhase = ''
-      env RUST_BACKTRACE=1 /tmp/rokcnix complete -k Kconfig -i ${input} -o $out ${overrides}
+      env RUST_BACKTRACE=1 rokcnix complete -k Kconfig -i ${input} -o $out ${overrides}
       cat $out
-      /tmp/rokc -q check "$out" Kconfig
+      rokc -q check "$out" Kconfig
     '';
   });
 in
@@ -90,17 +79,7 @@ in
   inherit (linux) src kernelPatches;
   inherit
     version
-    #randstructSeed
-    #extraMakeFlags
-    #extraMeta
     configfile
-    #modDirVersion
     ;
-  #allowImportFromDerivation = true;
-  #config = config;
   modDirVersion = "7.0.9";
-  #pos = builtins.unsafeGetAttrPos "version" args;
-}
-// {
-  #data = builtins.toFile ".config" config.configFile;
 }
