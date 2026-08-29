@@ -46,17 +46,21 @@ let
       #rokc
       (import ~/Projects/nix-module-system-kernel/rokc/build.nix)
     ];
-    env = commonFlags // {
-      # FIXME this is obviously very incomplete.
-      SRCARCH =
-        let
-          arch = stdenv.hostPlatform.linuxArch;
-        in
-        if arch == "x86_64" then "x86" else arch;
-      KERNELVERSION = version;
-      PAHOLE = "${lib.getExe pahole}";
-      #CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
-    };
+    env =
+      commonFlags
+      // {
+        # FIXME this is obviously very incomplete.
+        SRCARCH =
+          let
+            arch = stdenv.hostPlatform.linuxArch;
+          in
+          if arch == "x86_64" then "x86" else arch;
+        KERNELVERSION = version;
+        PAHOLE = "${lib.getExe pahole}";
+      }
+      // lib.optionalAttrs stdenv.cc.isClang {
+        CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
+      };
     postUnpack = ''
       export srctree="$(realpath "$sourceRoot")"
     '';
