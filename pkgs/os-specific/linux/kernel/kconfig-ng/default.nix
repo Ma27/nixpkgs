@@ -6,7 +6,7 @@
   buildPackages,
   breakpointHook,
   binutils,
-  version ? "7.0.9",
+  version ? "7.0.14",
   # TODO 'readTree' function that derives this JSON from a directory
   # structure that splits via arch/version.
   input ? ./config.json,
@@ -22,13 +22,13 @@
 
   /*
     TODO
-    reenable modules
     no hard-coded version
     rokc pkg
     requiredKernelConfig
     overrides-in-nix
     no dumb overrides in this file
     ensure convergence.
+    reenable modules
   */
 }:
 
@@ -60,7 +60,7 @@ let
       SRCARCH = "x86";
       KERNELVERSION = version;
       PAHOLE = "${lib.getExe pahole}";
-      CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
+      #CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
     };
     postUnpack = ''
       export srctree="$(realpath "$sourceRoot")"
@@ -68,7 +68,7 @@ let
     dontBuild = true;
     dontConfigure = true;
     installPhase = ''
-      env RUST_BACKTRACE=1 rokcnix complete -k Kconfig -i ${input} -o $out ${overrides}
+      env RUST_BACKTRACE=1 rokcnix complete -k Kconfig -i ${input} -o $out ${builtins.toFile "foo" "{}"}
       cat $out
       rokc -q check "$out" Kconfig
     '';
@@ -81,5 +81,5 @@ in
     version
     configfile
     ;
-  modDirVersion = "7.0.9";
+  modDirVersion = "7.0.14";
 }

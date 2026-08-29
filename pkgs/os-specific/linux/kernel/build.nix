@@ -322,7 +322,6 @@ lib.makeOverridable (
 
     configurePhase = ''
       runHook preConfigure
-      set -x
       mkdir build
       export buildRoot="$(pwd)/build"
 
@@ -333,6 +332,7 @@ lib.makeOverridable (
         exit 1
       fi
       ln -sv ${configfile} $buildRoot/.config
+      cat $buildRoot/.config
 
       # reads the existing .config file and prompts the user for options in
       # the current kernel source that are not found in the file.

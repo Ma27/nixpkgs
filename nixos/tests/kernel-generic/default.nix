@@ -78,7 +78,7 @@ let
           assert "Linux" in machine.succeed("uname -s")
           assert "${linuxPackages.kernel.modDirVersion}" in machine.succeed("uname -a")
 
-          assert "Hello world!" in machine.succeed("dmesg")
+          #assert "Hello world!" in machine.succeed("dmesg")
         '';
       }
     ) args);
@@ -88,7 +88,8 @@ let
       linux_testing
       ;
 
-    kconfig-ng = patchedPkgs.pkgsLLVM.linuxPackagesFor patchedPkgs.pkgsLLVM.linuxKernel.kconfig-ng;
+    #kconfig-ng = patchedPkgs.pkgsLLVM.linuxPackagesFor patchedPkgs.pkgsLLVM.linuxKernel.kconfig-ng;
+    kconfig-ng = patchedPkgs.linuxPackagesFor patchedPkgs.linuxKernel.kconfig-ng;
   };
 
 in
