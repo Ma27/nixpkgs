@@ -6,23 +6,20 @@
   buildPackages,
   breakpointHook,
   binutils,
-  version ? "7.0.14",
+  modDirVersion,
+  version,
   # TODO 'readTree' function that derives this JSON from a directory
   # structure that splits via arch/version.
   input ? ./config.json,
   overrides ? ./overrides.json,
-  rokc,
   stdenv,
   jq,
   # for kernelPackagesFor
-  features ? { },
   kernelPatches ? [ ],
-  randstructSeed ? null,
-  linuxKernel,
+  src,
 
   /*
     TODO
-    no hard-coded version
     rokc pkg
     requiredKernelConfig
     overrides-in-nix
@@ -33,8 +30,6 @@
 }:
 
 let
-  linux = linuxKernel.kernels.linux_7_0;
-
   # FIXME maybe even a scope? All the on-demand callPackage sucks!
   flags = builtins.removeAttrs (callPackage ../common-flags.nix { }) [
     "__functor"
@@ -46,7 +41,7 @@ let
     pname = "linux-.config";
     inherit version;
     __structuredAttrs = true;
-    inherit (linux) src;
+    inherit src;
     preferLocalBuild = true;
     nativeBuildInputs = [
       jq
@@ -76,10 +71,10 @@ let
 in
 (callPackage ../build.nix { inherit lib stdenv buildPackages; }) {
   pname = "linux";
-  inherit (linux) src kernelPatches;
+  inherit src kernelPatches;
   inherit
     version
     configfile
+    modDirVersion
     ;
-  modDirVersion = "7.0.14";
 }

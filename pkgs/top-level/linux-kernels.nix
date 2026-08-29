@@ -31,7 +31,17 @@ in
 {
   kernelPatches = callPackage ../os-specific/linux/kernel/patches.nix { };
 
-  kconfig-ng = callPackage ../os-specific/linux/kernel/kconfig-ng {};
+  kconfig-ng = callPackage ../os-specific/linux/kernel/kconfig-ng/entrypoint.nix {
+    branch = "7.0";
+    kernelPatches = [
+      kernelPatches.bridge_stp_helper
+      kernelPatches.request_key_helper
+    ];
+
+    # TODO read this dynamically out of a tree
+    input = ../os-specific/linux/kernel/kconfig-ng/config.json;
+    overrides = ../os-specific/linux/kernel/kconfig-ng/overrides.json;
+  };
 
   kernels = recurseIntoAttrs (
     lib.makeExtensible (
