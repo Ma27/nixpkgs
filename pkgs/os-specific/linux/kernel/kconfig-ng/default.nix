@@ -20,7 +20,6 @@
 
   /*
     TODO
-    rokc pkg
     requiredKernelConfig
     overrides-in-nix
     no dumb overrides in this file
@@ -69,7 +68,7 @@ let
     '';
   });
 in
-(callPackage ../build.nix { inherit lib stdenv buildPackages; }) {
+((callPackage ../build.nix { inherit lib stdenv buildPackages; }) {
   pname = "linux";
   inherit src kernelPatches;
   inherit
@@ -77,4 +76,30 @@ in
     configfile
     modDirVersion
     ;
+})
+// rec {
+  config =
+    let
+      config_ = (builtins.fromJSON (builtins.readFile input)).declarations;
+    in
+
+    let
+      attrName = attr: attr;
+    in
+    {
+      isSet = attr: lib.hasAttr (attrName attr) config;
+
+      getValue = attr: if config.isSet attr then let i = lib.getAttr (attrName attr) config; in i.tristate or i.freeform else null;
+
+      isYes = attr: (config.getValue attr) == "y";
+
+      isNo = attr: (config.getValue attr) == "n";
+
+      isModule = attr: (config.getValue attr) == "m";
+
+      isEnabled = attr: (config.isModule attr) || (config.isYes attr);
+
+      isDisabled = attr: (!(config.isSet attr)) || (config.isNo attr);
+    }
+    // config_;
 }

@@ -499,17 +499,17 @@ in
         ++ (optional (randstructSeed != "") (isYes "GCC_PLUGIN_RANDSTRUCT"));
 
       # nixpkgs kernels are assumed to have all required features
-      #assertions =
-        #if config.boot.kernelPackages.kernel ? features then
-          #[ ]
-        #else
-          #let
-            #cfg = config.boot.kernelPackages.kernel.config;
-          #in
-          #map (attrs: {
-            #assertion = attrs.assertion cfg;
-            #inherit (attrs) message;
-          #}) config.system.requiredKernelConfig;
+      assertions =
+        if config.boot.kernelPackages.kernel ? features then
+          [ ]
+        else
+          let
+            cfg = config.boot.kernelPackages.kernel.config;
+          in
+          map (attrs: {
+            assertion = attrs.assertion cfg;
+            inherit (attrs) message;
+          }) config.system.requiredKernelConfig;
 
     })
 
