@@ -8,13 +8,12 @@
 
   lib,
   pahole,
-  callPackage,
-  buildPackages,
   binutils,
   stdenv,
   jq,
 
   commonFlags,
+  buildLinuxWithConfig,
 
   strace,
   breakpointHook,
@@ -36,9 +35,8 @@
 let
   configfile = stdenv.mkDerivation (finalAttrs: {
     pname = "linux-.config";
-    inherit version;
+    inherit version src;
     __structuredAttrs = true;
-    inherit src;
     preferLocalBuild = true;
     nativeBuildInputs = [
       jq
@@ -49,7 +47,12 @@ let
       (import ~/Projects/nix-module-system-kernel/rokc/build.nix)
     ];
     env = commonFlags // {
-      SRCARCH = "x86";
+      # FIXME this is obviously very incomplete.
+      SRCARCH =
+        let
+          arch = stdenv.hostPlatform.linuxArch;
+        in
+        if arch == "x86_64" then "x86" else arch;
       KERNELVERSION = version;
       PAHOLE = "${lib.getExe pahole}";
       #CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
@@ -66,7 +69,7 @@ let
     '';
   });
 in
-((callPackage ../kernel/build.nix { inherit lib stdenv buildPackages; }) {
+(buildLinuxWithConfig {
   pname = "linux";
   inherit src kernelPatches;
   inherit
