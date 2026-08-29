@@ -95,6 +95,16 @@ lib.makeOverridable (
     features ? { },
     lib ? lib_,
     stdenv ? stdenv_,
+
+    commonMakeFlags ? import ./common-flags.nix {
+      extraMakeFlags = assert extraMakeFlags == []; {}; # FIXME stop-gap to keep eval working!
+      inherit
+        lib
+        stdenv
+        buildPackages
+        #extraMakeFlags
+        ;
+    },
   }:
 
   let
@@ -117,16 +127,6 @@ lib.makeOverridable (
       teams
       platforms
       ;
-
-    commonMakeFlags = import ./common-flags.nix {
-      extraMakeFlags = assert extraMakeFlags == []; {}; # FIXME stop-gap to keep eval working!
-      inherit
-        lib
-        stdenv
-        buildPackages
-        #extraMakeFlags
-        ;
-    };
 
     config =
       let

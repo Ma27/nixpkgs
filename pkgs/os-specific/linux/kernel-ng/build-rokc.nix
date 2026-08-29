@@ -1,22 +1,27 @@
 {
+  modDirVersion,
+  version,
+  input,
+  overrides,
+  kernelPatches ? [ ],
+  src,
+
   lib,
   pahole,
   callPackage,
-  strace,
   buildPackages,
-  breakpointHook,
   binutils,
-  modDirVersion,
-  version,
-  # TODO 'readTree' function that derives this JSON from a directory
-  # structure that splits via arch/version.
-  input ? ./config.json,
-  overrides ? ./overrides.json,
   stdenv,
   jq,
-  # for kernelPackagesFor
-  kernelPatches ? [ ],
-  src,
+
+  commonFlags,
+
+  strace,
+  breakpointHook,
+
+  # FIXME get rid of that, only to please the NixOS API calling this.
+  features ? { },
+  randstructSeed ? null,
 
   /*
     TODO
@@ -29,13 +34,6 @@
 }:
 
 let
-  # FIXME maybe even a scope? All the on-demand callPackage sucks!
-  flags = builtins.removeAttrs (callPackage ../common-flags.nix { }) [
-    "__functor"
-    "override"
-    "overrideDerivation"
-  ];
-
   configfile = stdenv.mkDerivation (finalAttrs: {
     pname = "linux-.config";
     inherit version;
@@ -50,7 +48,7 @@ let
       #rokc
       (import ~/Projects/nix-module-system-kernel/rokc/build.nix)
     ];
-    env = flags // {
+    env = commonFlags // {
       SRCARCH = "x86";
       KERNELVERSION = version;
       PAHOLE = "${lib.getExe pahole}";
@@ -68,7 +66,7 @@ let
     '';
   });
 in
-((callPackage ../build.nix { inherit lib stdenv buildPackages; }) {
+((callPackage ../kernel/build.nix { inherit lib stdenv buildPackages; }) {
   pname = "linux";
   inherit src kernelPatches;
   inherit
@@ -89,7 +87,15 @@ in
     {
       isSet = attr: lib.hasAttr (attrName attr) config;
 
-      getValue = attr: if config.isSet attr then let i = lib.getAttr (attrName attr) config; in i.tristate or i.freeform else null;
+      getValue =
+        attr:
+        if config.isSet attr then
+          let
+            i = lib.getAttr (attrName attr) config;
+          in
+          i.tristate or i.freeform
+        else
+          null;
 
       isYes = attr: (config.getValue attr) == "y";
 

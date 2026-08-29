@@ -89,7 +89,7 @@ let
       ;
 
     #kconfig-ng = patchedPkgs.pkgsLLVM.linuxPackagesFor patchedPkgs.pkgsLLVM.linuxKernel.kconfig-ng;
-    kconfig-ng = patchedPkgs.linuxPackagesFor patchedPkgs.linuxKernel.kconfig-ng;
+    kconfig-ng = patchedPkgs.linuxKernel.kconfig-ng.pkgs.linux_7_0;
   };
 
 in

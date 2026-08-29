@@ -1,17 +1,15 @@
-# Adaptation of mainline.nix, not decided yet if that's needed in the final form of this project.
-let
-  allKernels = builtins.fromJSON (builtins.readFile ../kernels-org.json);
-in
+{
+  allKernels,
+  lib,
+  fetchurl,
+  buildLinuxWithRokc,
+}:
 
 {
   branch,
-  kernelPatches,
-  lib,
-  fetchurl,
   overrides,
   input,
-  callPackage,
-  ...
+  kernelPatches,
 }:
 
 let
@@ -23,7 +21,13 @@ let
     inherit (thisKernel) hash;
   };
 in
-callPackage ./. {
-  inherit src kernelPatches version input overrides;
+buildLinuxWithRokc {
+  inherit
+    src
+    kernelPatches
+    version
+    input
+    overrides
+    ;
   modDirVersion = lib.versions.pad 3 version;
 }
