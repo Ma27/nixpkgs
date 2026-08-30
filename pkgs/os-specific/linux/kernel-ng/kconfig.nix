@@ -6,7 +6,7 @@
 }:
 
 {
-  configAccessor = lib.fix (self: {
+  configAccessor = {
     _type = "rokc";
 
     mkAssertions =
@@ -72,5 +72,42 @@
       what = "disabled";
       inherit name;
     };
-  });
+  };
+
+  mkKConfigEvaluator =
+    inputFile: extras:
+    lib.fix (self: {
+      inherit inputFile;
+      inherit (builtins.fromJSON (builtins.readFile inputFile)) declarations;
+
+      evalOverrides = lib.evalModules {
+        modules = [
+          # FIXME
+          # this needs some documentation clarifying that this is for non-invasive
+          # overrides only. E.g. MODULES=n should be done via rokc.
+          # Maybe some rules-of-thumb or quick tests might be good.
+          ({ config, ... }: {
+            options = {
+              defaults = lib.mkOption {
+                type = lib.types.attrsOf lib.types.raw;
+                readOnly = true;
+                default = self.declarations;
+                defaultText = "<ROKC declarations>";
+              };
+              custom = lib.mkOption {
+                type = lib.types.attrsOf lib.types.raw;
+                default = { };
+              };
+              outFile = lib.mkOption {
+                type = lib.types.path;
+                readOnly = true;
+                defaultText = "<file with all overrides>";
+                default = builtins.toFile "overrides.json" (builtins.toJSON config.custom);
+              };
+            };
+          })
+          extras
+        ];
+      };
+    });
 }

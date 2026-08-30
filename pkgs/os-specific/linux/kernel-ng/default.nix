@@ -6,10 +6,9 @@
 
   /*
     TODO
-    allow usage of both kconfig things
-    eval-level assertions for basic shit
-    overrides-in-nix
     reenable modules
+    upstream
+    llvm
   */
 
 lib.makeScope newScope (self: {
@@ -22,7 +21,7 @@ lib.makeScope newScope (self: {
       ];
 
       input = ./cfg/config.json;
-      overrides = ./cfg/overrides.json;
+      overrides = ./cfg/overrides.nix;
     };
   });
 

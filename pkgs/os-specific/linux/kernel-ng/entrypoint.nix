@@ -3,12 +3,13 @@
   lib,
   fetchurl,
   buildLinuxWithRokc,
+  kconfigLib,
 }:
 
 {
   branch,
-  overrides,
   input,
+  overrides,
   kernelPatches,
 }:
 
@@ -26,8 +27,8 @@ buildLinuxWithRokc {
     src
     kernelPatches
     version
-    input
-    overrides
     ;
   modDirVersion = lib.versions.pad 3 version;
+
+  kconfig = kconfigLib.mkKConfigEvaluator input overrides;
 }

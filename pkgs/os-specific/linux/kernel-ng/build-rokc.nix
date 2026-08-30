@@ -1,8 +1,7 @@
 {
   modDirVersion,
   version,
-  input,
-  overrides,
+  kconfig,
   kernelPatches ? [ ],
   src,
 
@@ -49,6 +48,7 @@ let
           if arch == "x86_64" then "x86" else arch;
         KERNELVERSION = version;
         PAHOLE = "${lib.getExe pahole}";
+        RUST_BACKTRACE = "1";
       }
       // lib.optionalAttrs stdenv.cc.isClang {
         CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
@@ -59,7 +59,7 @@ let
     dontBuild = true;
     dontConfigure = true;
     installPhase = ''
-      env RUST_BACKTRACE=1 rokcnix complete -k Kconfig -i ${input} -o $out ${builtins.toFile "foo" "{}"}
+      rokcnix complete -k Kconfig -i ${kconfig.inputFile} -o $out ${kconfig.evalOverrides.config.outFile}
       cat $out
       rokc -q check "$out" Kconfig
     '';
@@ -81,7 +81,7 @@ in
       ...
     }:
     lib.nameValuePair "CONFIG_${name}" (if tristate == null then freeform else tristate)
-  ) (builtins.fromJSON (builtins.readFile input)).declarations;
+  ) (kconfig.declarations // kconfig.evalOverrides.config.custom);
 })
 // {
   buildtimeConfig = kconfigLib.configAccessor;
