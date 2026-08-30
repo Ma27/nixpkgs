@@ -4,6 +4,16 @@
   packagesFor,
 }:
 
+  /*
+    TODO
+    requiredKernelConfig
+      +refactor
+    allow usage of both kconfig things
+    eval-level assertions for basic shit
+    overrides-in-nix
+    reenable modules
+  */
+
 lib.makeScope newScope (self: {
   kernels = lib.makeExtensible (_: {
     linux_7_0 = self.buildMainline {
@@ -24,11 +34,13 @@ lib.makeScope newScope (self: {
 
   # Helpers
 
+  rokc = (import ~/Projects/nix-module-system-kernel/rokc/build.nix); # FIXME replace with proper package!
+
   buildMainline = self.callPackage ./entrypoint.nix { };
 
   buildLinuxWithRokc = self.callPackage ./build-rokc.nix;
 
-  kconfigLib = throw "undefined";
+  kconfigLib = self.callPackage ./kconfig.nix { };
 
   # Legacy things: using code from os-specific/linux/kernel.
 
