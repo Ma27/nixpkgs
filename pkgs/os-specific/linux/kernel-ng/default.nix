@@ -6,8 +6,6 @@
 
   /*
     TODO
-    requiredKernelConfig
-      +refactor
     allow usage of both kconfig things
     eval-level assertions for basic shit
     overrides-in-nix

@@ -73,6 +73,15 @@ in
     configfile
     modDirVersion
     ;
+  overrideEvalTimeConfig = lib.mapAttrs' (
+    name:
+    {
+      freeform ? null,
+      tristate ? null,
+      ...
+    }:
+    lib.nameValuePair "CONFIG_${name}" (if tristate == null then freeform else tristate)
+  ) (builtins.fromJSON (builtins.readFile input)).declarations;
 })
 // {
   buildtimeConfig = kconfigLib.configAccessor;

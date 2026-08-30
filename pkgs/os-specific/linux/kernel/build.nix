@@ -86,6 +86,8 @@ lib.makeOverridable (
     randstructSeed ? "",
     # Extra meta attributes
     extraMeta ? { },
+    # Config-values that do not explicitly match the configfile, but are available at eval-time.
+    overrideEvalTimeConfig ? null,
 
     # for module compatibility
     isZen ? false,
@@ -147,7 +149,7 @@ lib.makeOverridable (
 
         isDisabled = attr: (!(config.isSet attr)) || (config.isNo attr);
       }
-      // config_;
+      // (if builtins.isAttrs overrideEvalTimeConfig then overrideEvalTimeConfig else config_);
 
     isModular = true; #config.isYes "MODULES";
     withRust = false; #config.isYes "RUST";
