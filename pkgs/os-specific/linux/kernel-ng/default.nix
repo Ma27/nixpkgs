@@ -8,6 +8,7 @@
     TODO
     reenable modules
     upstream
+    compare built config with previous version
     llvm
   */
 
