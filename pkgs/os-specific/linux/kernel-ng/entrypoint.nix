@@ -7,14 +7,22 @@
 }:
 
 lib.makeOverridable (
-  {
+  args@{
     branch,
     input,
     overrides,
     kernelPatches,
+    ...
   }:
 
   let
+    toPassDown = builtins.removeAttrs args [
+      "branch"
+      "input"
+      "overrides"
+      "kernelPatches"
+    ];
+
     thisKernel = allKernels.${branch};
     inherit (thisKernel) version;
 
@@ -23,14 +31,17 @@ lib.makeOverridable (
       inherit (thisKernel) hash;
     };
   in
-  buildLinuxWithRokc {
-    inherit
-      src
-      kernelPatches
-      version
-      ;
-    modDirVersion = lib.versions.pad 3 version;
+  buildLinuxWithRokc (
+    {
+      inherit
+        src
+        kernelPatches
+        version
+        ;
+      modDirVersion = lib.versions.pad 3 version;
 
-    kconfig = kconfigLib.mkKConfigEvaluator input overrides;
-  }
+      kconfig = kconfigLib.mkKConfigEvaluator input overrides;
+    }
+    // toPassDown
+  )
 )
