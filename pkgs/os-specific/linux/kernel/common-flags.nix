@@ -24,6 +24,7 @@
   HOSTAR = "${lib.getExe' buildPackages.stdenv.cc.bintools "${buildPackages.stdenv.cc.targetPrefix}ar"}";
   HOSTLD = "${lib.getExe' buildPackages.stdenv.cc.bintools "${buildPackages.stdenv.cc.targetPrefix}ld"}";
   ARCH = "${stdenv.hostPlatform.linuxArch}";
+  CLANG_FLAGS = "-fintegrated-as";
   CROSS_COMPILE = "${stdenv.cc.targetPrefix}";
 }
 # Add the built in headers the kernel needs

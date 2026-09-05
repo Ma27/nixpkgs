@@ -33,7 +33,7 @@ let
     nativeBuildInputs = [
       jq
       strace
-      binutils
+      #binutils
       breakpointHook
       rokc
     ];
@@ -49,9 +49,6 @@ let
         KERNELVERSION = version;
         PAHOLE = "${lib.getExe pahole}";
         RUST_BACKTRACE = "1";
-      }
-      // lib.optionalAttrs stdenv.cc.isClang {
-        CLANG_FLAGS = "-no-integrated-as -fno-integrated-as";
       };
     postUnpack = ''
       export srctree="$(realpath "$sourceRoot")"
