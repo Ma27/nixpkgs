@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchpatch,
 
   # Native build inputs
   docbook-xsl-nons,
@@ -80,6 +81,15 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     patchShebangs .
   '';
+
+  patches = [
+    # fix build w/ glibc-2.44
+    (fetchpatch {
+      url = "https://github.com/libvips/libvips/commit/b46ef77d06308fba3441aea0a5b47ac343d8a57b.patch";
+      hash = "sha256-shXLw9DJ1MSsKSNk6YX8XuvAt0I1MLlsQViKl2btV3g=";
+      excludes = [ "ChangeLog" ];
+    })
+  ];
 
   nativeBuildInputs = [
     docbook-xsl-nons
