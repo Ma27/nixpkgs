@@ -17,6 +17,9 @@ stdenv.mkDerivation {
     hash = "sha256-cfBKly95vI+8u6lZ4LyrSrNvCf3ogTKtLDzuodO26qw=";
   };
 
+  # fix build w/ glibc-2.44
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=discarded-qualifiers";
+
   nativeBuildInputs = [ cmake ];
   buildInputs = [ libubox ];
 
