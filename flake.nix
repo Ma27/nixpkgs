@@ -248,6 +248,7 @@
                 "terraform" # for coder :(
                 "samsung-unified-linux-driver"
                 "steam"
+                "steam-unwrapped"
               ];
             chromium.enableWideVine = true;
             permittedInsecurePackages = [
