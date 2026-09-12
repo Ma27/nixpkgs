@@ -247,6 +247,7 @@
                 "youtrack"
                 "terraform" # for coder :(
                 "samsung-unified-linux-driver"
+                "steam"
               ];
             chromium.enableWideVine = true;
             permittedInsecurePackages = [
