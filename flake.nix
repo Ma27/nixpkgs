@@ -235,6 +235,7 @@
               with lib;
               drv:
               elem (builtins.parseDrvName (drv.name or drv.pname)).name [
+                "corefonts"
                 "chrome-widevine-cdm"
                 "chromium"
                 "chromium-binary-plugin-widevine"
