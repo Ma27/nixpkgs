@@ -250,6 +250,7 @@
                 "samsung-unified-linux-driver"
                 "steam"
                 "steam-unwrapped"
+                "discord"
               ];
             chromium.enableWideVine = true;
             permittedInsecurePackages = [
