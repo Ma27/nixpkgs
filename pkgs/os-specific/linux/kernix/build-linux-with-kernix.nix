@@ -26,7 +26,7 @@
 
 let
   configfile = stdenv.mkDerivation (finalAttrs: {
-    pname = "linux-.config";
+    pname = "linux.config";
     inherit version src;
     __structuredAttrs = true;
     preferLocalBuild = true;
@@ -76,23 +76,24 @@ in
     }:
     lib.nameValuePair "CONFIG_${name}" (if tristate == null then freeform else tristate)
   ) (kconfig.declarations // kconfig.evalOverrides.config.custom);
-}).overrideAttrs {
-  shellHook = ''
-    export SRCARCH="x86"
-    export CLANG_FLAGS=""
-    export srctree="."
-    export BINDGEN=bindgen
-    export PAHOLE=pahole
-    export RUSTC=rustc
-    export ARCH=x86
-    export PYTHON3=python3
-    export USERLDFLAGS=""
-    export USERCFLAGS=""
-    export CC_VERSION_TEXT="23.42"
-    export KERNELVERSION="6.18.1"
-    export RUSTC_VERSION_TEXT="1.95"
-  '';
-}
+}).overrideAttrs
+  {
+    shellHook = ''
+      export SRCARCH="x86"
+      export CLANG_FLAGS=""
+      export srctree="."
+      export BINDGEN=bindgen
+      export PAHOLE=pahole
+      export RUSTC=rustc
+      export ARCH=x86
+      export PYTHON3=python3
+      export USERLDFLAGS=""
+      export USERCFLAGS=""
+      export CC_VERSION_TEXT="23.42"
+      export KERNELVERSION="6.18.1"
+      export RUSTC_VERSION_TEXT="1.95"
+    '';
+  }
 // {
   buildtimeConfig = kconfigLib.configAccessor;
 }

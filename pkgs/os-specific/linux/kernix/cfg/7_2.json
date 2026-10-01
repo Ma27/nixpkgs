@@ -188,12 +188,12 @@
       "tristate": "y",
       "src": "FromConfig"
     },
-    "CRYPTO_USER_API_HASH": {
+    "CRYPTO": {
       "tristate": "m",
       "src": "User"
     },
-    "NET": {
-      "tristate": "y",
+    "CRYPTO_USER_API_HASH": {
+      "tristate": "m",
       "src": "User"
     },
     "CRYPTO_HMAC": {
@@ -213,6 +213,22 @@
       "src": "User"
     },
     "TMPFS_XATTR": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "RD_ZSTD": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "CRYPTO_XXHASH": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "XXHASH": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "SMP": {
       "tristate": "y",
       "src": "User"
     },

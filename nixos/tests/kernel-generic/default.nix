@@ -65,7 +65,6 @@ let
             boot.kernelPackages = linuxPackages;
 
             boot.initrd.allowMissingModules = true;
-            boot.initrd.compressor = "cat";
 
             boot.extraModulePackages = [ config.boot.kernelPackages.hello-world ];
 
