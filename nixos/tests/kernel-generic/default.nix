@@ -64,8 +64,6 @@ let
 
             boot.kernelPackages = linuxPackages;
 
-            boot.initrd.allowMissingModules = true;
-
             boot.extraModulePackages = [ config.boot.kernelPackages.hello-world ];
 
             boot.kernelModules = [ "hello" ];

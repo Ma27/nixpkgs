@@ -232,6 +232,130 @@
       "tristate": "y",
       "src": "User"
     },
+    "ATA": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "SATA_AHCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "ATA_PIIX": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "EFIVAR_FS": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "EFI": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "USB_EHCI_HCD": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "USB_EHCI_PCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "USB_OHCI_HCD": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "USB_OHCI_HCD_PCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "LEDS_CLASS": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "LEDS_CLASS_MULTICOLOR": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "NEW_LEDS": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "HIDRAW": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "USB_HID": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "HID_APPLE": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LENOVO": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_CHERRY": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_ROCCAT": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LOGITECH": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LOGITECH_HIDPP": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LOGITECH_DJ": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_MICROSOFT": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_CORSAIR": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_GENERIC": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "BLOCK": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "RPMB": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "MMC_BLOCK": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "BLK_DEV_NVME": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "BLK_DEV_SD": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "BLK_DEV_SR": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "PATA_MARVELL": {
+      "tristate": "m",
+      "src": "User"
+    },
     "SQUASHFS": {
       "tristate": "m",
       "src": "FromConfig"
