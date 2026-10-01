@@ -188,6 +188,34 @@
       "tristate": "y",
       "src": "FromConfig"
     },
+    "CRYPTO_USER_API_HASH": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "NET": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "CRYPTO_HMAC": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "CRYPTO_SHA256": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "AUTOFS_FS": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "TMPFS_POSIX_ACL": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "TMPFS_XATTR": {
+      "tristate": "y",
+      "src": "User"
+    },
     "SQUASHFS": {
       "tristate": "m",
       "src": "FromConfig"

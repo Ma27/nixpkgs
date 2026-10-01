@@ -86,7 +86,7 @@ let
       linux_testing
       ;
 
-    kernix = patchedPkgs.linuxKernel.kernix.linux_7_2;
+    kernix = patchedPkgs.linuxKernel.kernix.pkgs.linux_7_2;
   };
 
 in
