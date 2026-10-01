@@ -10,7 +10,7 @@ lib.makeOverridable (
   args@{
     branch,
     input,
-    overrides,
+    overrides ? null,
     kernelPatches,
     ...
   }:

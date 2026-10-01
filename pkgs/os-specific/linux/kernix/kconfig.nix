@@ -106,6 +106,8 @@
               };
             };
           })
+        ]
+        ++ lib.optionals (extras != null) [
           extras
         ];
       };

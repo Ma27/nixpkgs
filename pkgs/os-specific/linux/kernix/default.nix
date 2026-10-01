@@ -12,20 +12,18 @@
 
 lib.makeScope newScope (self: {
   kernels = lib.makeExtensible (_: {
-    linux_7_0 = self.buildMainline {
-      branch = "7.0";
+    linux_7_2 = self.buildMainline {
+      branch = "7.2";
       kernelPatches = [
         self.kernelPatches.bridge_stp_helper
         self.kernelPatches.request_key_helper
       ];
-
-      input = ./cfg/config.json;
-      overrides = ./cfg/overrides.nix;
+      input = ./cfg/7_2.json;
     };
   });
 
   pkgs = lib.makeExtensible (_: {
-    linux_7_0 = lib.recurseIntoAttrs (packagesFor self.kernels.linux_7_0);
+    linux_7_2 = lib.recurseIntoAttrs (packagesFor self.kernels.linux_7_2);
   });
 
   # Helpers

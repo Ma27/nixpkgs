@@ -172,10 +172,6 @@
       "tristate": "y",
       "src": "FromConfig"
     },
-    "HAMRADIO": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
     "TMPFS": {
       "tristate": "y",
       "src": "FromConfig"
