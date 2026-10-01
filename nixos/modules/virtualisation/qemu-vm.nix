@@ -1518,6 +1518,7 @@ in
         (isEnabled "EXT4_FS")
         (isEnabled "NET_9P_VIRTIO")
         (isEnabled "9P_FS")
+        (isYes "BLK_DEV")
         (isYes "PCI")
         (isYes "NETDEVICES")
         (isYes "NET_CORE")

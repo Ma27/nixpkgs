@@ -2,7 +2,7 @@
   allKernels,
   lib,
   fetchurl,
-  buildLinuxWithRokc,
+  buildLinuxWithKernix,
   kconfigLib,
 }:
 
@@ -16,7 +16,7 @@ lib.makeOverridable (
   }:
 
   let
-    toPassDown = builtins.removeAttrs args [
+    toPassDown = removeAttrs args [
       "branch"
       "input"
       "overrides"
@@ -31,7 +31,7 @@ lib.makeOverridable (
       inherit (thisKernel) hash;
     };
   in
-  buildLinuxWithRokc (
+  buildLinuxWithKernix (
     {
       inherit
         src

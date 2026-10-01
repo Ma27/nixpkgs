@@ -63,9 +63,8 @@ let
             # ]
 
             boot.kernelPackages = linuxPackages;
-            boot.initrd.availableKernelModules = ["ext4" "virtio_blk" "virtio_pci" "whatnothisiswrong"];
+
             boot.initrd.allowMissingModules = true;
-            boot.initrd.kernelModules = ["ext4"];
             boot.initrd.compressor = "cat";
 
             boot.extraModulePackages = [ config.boot.kernelPackages.hello-world ];
@@ -87,8 +86,7 @@ let
       linux_testing
       ;
 
-    #kconfig-ng = patchedPkgs.pkgsLLVM.linuxPackagesFor patchedPkgs.pkgsLLVM.linuxKernel.kconfig-ng;
-    kconfig-ng = patchedPkgs.pkgsLLVM.linuxKernel.kconfig-ng.pkgs.linux_7_0;
+    kernix = patchedPkgs.linuxKernel.kernix.pkgs.linux_7_0;
   };
 
 in

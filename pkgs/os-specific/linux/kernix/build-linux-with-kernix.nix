@@ -10,7 +10,7 @@
   binutils,
   stdenv,
   jq,
-  rokc,
+  kernix,
 
   commonFlags,
   buildLinuxWithConfig,
@@ -35,30 +35,27 @@ let
       strace
       #binutils
       breakpointHook
-      rokc
+      kernix
     ];
-    env =
-      commonFlags
-      // {
-        # FIXME this is obviously very incomplete.
-        SRCARCH =
-          let
-            arch = stdenv.hostPlatform.linuxArch;
-          in
-          if arch == "x86_64" then "x86" else arch;
-        KERNELVERSION = version;
-        PAHOLE = "${lib.getExe pahole}";
-        RUST_BACKTRACE = "1";
-      };
+    env = commonFlags // {
+      # FIXME this is obviously very incomplete.
+      SRCARCH =
+        let
+          arch = stdenv.hostPlatform.linuxArch;
+        in
+        if arch == "x86_64" then "x86" else arch;
+      KERNELVERSION = version;
+      PAHOLE = "${lib.getExe pahole}";
+      RUST_BACKTRACE = "1";
+    };
     postUnpack = ''
       export srctree="$(realpath "$sourceRoot")"
     '';
     dontBuild = true;
     dontConfigure = true;
     installPhase = ''
-      rokcnix complete -k Kconfig -i ${kconfig.inputFile} -o $out ${kconfig.evalOverrides.config.outFile}
+      kernix complete -k Kconfig -i ${kconfig.inputFile} -o $out ${kconfig.evalOverrides.config.outFile}
       cat $out
-      rokc -q check "$out" Kconfig
     '';
   });
 in

@@ -4,11 +4,11 @@
   packagesFor,
 }:
 
-  /*
-    TODO
-    compare built config with previous version
-    llvm
-  */
+/*
+  TODO
+  compare built config with previous version
+  llvm
+*/
 
 lib.makeScope newScope (self: {
   kernels = lib.makeExtensible (_: {
@@ -30,11 +30,9 @@ lib.makeScope newScope (self: {
 
   # Helpers
 
-  rokc = (import ~/Projects/nix-module-system-kernel/rokc/build.nix); # FIXME replace with proper package!
+  buildMainline = self.callPackage ./build-mainline.nix { };
 
-  buildMainline = self.callPackage ./entrypoint.nix { };
-
-  buildLinuxWithRokc = self.callPackage ./build-rokc.nix;
+  buildLinuxWithKernix = self.callPackage ./build-linux-with-kernix.nix;
 
   kconfigLib = self.callPackage ./kconfig.nix { };
 

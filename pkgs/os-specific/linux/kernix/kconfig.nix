@@ -1,13 +1,13 @@
 {
   lib,
-  rokc,
+  kernix,
   runCommand,
   jq,
 }:
 
 {
   configAccessor = {
-    _type = "rokc";
+    _type = "kernix";
 
     mkAssertions =
       config: conditions:
@@ -37,14 +37,14 @@
       runCommand "kconfig-checks"
         {
           nativeBuildInputs = [
-            rokc
+            kernix
             jq
           ];
           __structuredAttrs = true;
           inherit assertions;
         }
         ''
-          rokcnix assert -c ${config} -a <(jq -r .assertions < "$NIX_ATTRS_JSON_FILE")
+          kernix assert -c ${config} -a <(jq -r .assertions < "$NIX_ATTRS_JSON_FILE")
           touch $out
         '';
 
@@ -84,7 +84,7 @@
         modules = [
           # FIXME
           # this needs some documentation clarifying that this is for non-invasive
-          # overrides only. E.g. MODULES=n should be done via rokc.
+          # overrides only. E.g. MODULES=n should be done via kernix.
           # Maybe some rules-of-thumb or quick tests might be good.
           ({ config, ... }: {
             options = {

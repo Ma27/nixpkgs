@@ -31,7 +31,7 @@ in
 {
   kernelPatches = callPackage ../os-specific/linux/kernel/patches.nix { };
 
-  kconfig-ng = callPackage ../os-specific/linux/kernel-ng {
+  kernix = callPackage ../os-specific/linux/kernix {
     inherit packagesFor;
   };
 
