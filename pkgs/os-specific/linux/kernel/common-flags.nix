@@ -24,7 +24,6 @@
   HOSTAR = "${lib.getExe' buildPackages.stdenv.cc.bintools "${buildPackages.stdenv.cc.targetPrefix}ar"}";
   HOSTLD = "${lib.getExe' buildPackages.stdenv.cc.bintools "${buildPackages.stdenv.cc.targetPrefix}ld"}";
   ARCH = "${stdenv.hostPlatform.linuxArch}";
-  CLANG_FLAGS = "-fintegrated-as";
   CROSS_COMPILE = "${stdenv.cc.targetPrefix}";
 }
 # Add the built in headers the kernel needs
@@ -34,6 +33,7 @@
     majorVer = lib.versions.major clangLib.version;
   in
   {
+    CLANG_FLAGS = "-fintegrated-as";
     CFLAGS_MODULE = "-I${clangLib}/lib/clang/${majorVer}/include";
     CFLAGS_KERNEL = "-I${clangLib}/lib/clang/${majorVer}/include";
   }
