@@ -1,14 +1,10 @@
 {
   "declarations": {
-    "SERIAL_8250_CONSOLE": {
-      "tristate": "y",
+    "9P_FS": {
+      "tristate": "m",
       "src": "User"
     },
-    "MODULES": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "BLK_CGROUP_IOPRIO": {
+    "ACPI_DOCK": {
       "tristate": "y",
       "src": "FromConfig"
     },
@@ -16,227 +12,11 @@
       "tristate": "y",
       "src": "FromConfig"
     },
-    "MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "PCI": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "EXT4_FS": {
-      "tristate": "m",
-      "src": "FromConfig"
-    },
-    "CGROUP_DMEM": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "OVERLAY_FS": {
-      "tristate": "m",
-      "src": "FromConfig"
-    },
-    "SERIAL_8250": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "WQ_POWER_EFFICIENT_DEFAULT": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "VIRTIO_BALLOON": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "MD": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "NET_9P_VIRTIO": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "CGROUP_SCHED": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "NET": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "MEMCG": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "VIRTIO_IOMMU": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "BLK_DEV_INITRD": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "VIRTIO_NET": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "CGROUP_PIDS": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "NET_9P": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "UNIX": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "DEVTMPFS": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "BLK_CGROUP": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "9P_FS": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "NETDEVICES": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "CGROUP_FREEZER": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "PM_AUTOSLEEP": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "VIRTIO_INPUT": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "VIRTIO_DEBUG": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "RT_GROUP_SCHED": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "VIRTIO_BLK": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "USB": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "SYSVIPC": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "INET": {
-      "tristate": "y",
-      "src": "User"
-    },
     "ACPI_TAD": {
       "tristate": "m",
       "src": "FromConfig"
     },
-    "CGROUP_RDMA": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "VIRTIO_PCI": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "VHOST_NET": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "VIRTIO_CONSOLE": {
-      "tristate": "m",
-      "src": "FromConfig"
-    },
-    "CGROUPS": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "MEMCG_V1": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "TMPFS": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "IP_MULTICAST": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "ACPI_DOCK": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "DAX": {
-      "tristate": "y",
-      "src": "FromConfig"
-    },
-    "CRYPTO": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "CRYPTO_USER_API_HASH": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "CRYPTO_HMAC": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "CRYPTO_SHA256": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "AUTOFS_FS": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "TMPFS_POSIX_ACL": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "TMPFS_XATTR": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "RD_ZSTD": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "CRYPTO_XXHASH": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "XXHASH": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "SMP": {
-      "tristate": "y",
-      "src": "User"
-    },
     "ATA": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "SATA_AHCI": {
       "tristate": "m",
       "src": "User"
     },
@@ -244,105 +24,21 @@
       "tristate": "m",
       "src": "User"
     },
-    "EFIVAR_FS": {
+    "AUTOFS_FS": {
       "tristate": "m",
       "src": "User"
     },
-    "EFI": {
+    "BLK_CGROUP": {
       "tristate": "y",
-      "src": "User"
+      "src": "FromConfig"
     },
-    "USB_EHCI_HCD": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "USB_EHCI_PCI": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "USB_OHCI_HCD": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "USB_OHCI_HCD_PCI": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "LEDS_CLASS": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "LEDS_CLASS_MULTICOLOR": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "NEW_LEDS": {
+    "BLK_CGROUP_IOPRIO": {
       "tristate": "y",
-      "src": "User"
+      "src": "FromConfig"
     },
-    "HIDRAW": {
+    "BLK_DEV_INITRD": {
       "tristate": "y",
-      "src": "User"
-    },
-    "USB_HID": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "HID_APPLE": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_LENOVO": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_CHERRY": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_ROCCAT": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_LOGITECH": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_LOGITECH_HIDPP": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_LOGITECH_DJ": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_MICROSOFT": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_CORSAIR": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "HID_GENERIC": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "BLOCK": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "RPMB": {
-      "tristate": "m",
-      "src": "User"
-    },
-    "MMC": {
-      "tristate": "y",
-      "src": "User"
-    },
-    "MMC_BLOCK": {
-      "tristate": "m",
-      "src": "User"
+      "src": "FromConfig"
     },
     "BLK_DEV_NVME": {
       "tristate": "m",
@@ -356,13 +52,321 @@
       "tristate": "m",
       "src": "User"
     },
+    "BLOCK": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "CGROUPS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUP_DMEM": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUP_FREEZER": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUP_PIDS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUP_RDMA": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "CGROUP_SCHED": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "COMPILE_TEST": {
+      "tristate": "n",
+      "src": "User"
+    },
+    "CRYPTO": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "CRYPTO_HMAC": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "CRYPTO_SHA256": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "CRYPTO_USER_API_HASH": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "CRYPTO_XXHASH": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "DAX": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "DEVTMPFS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "EFI": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "EFIVAR_FS": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "EXT4_FS": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "HIDRAW": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "HID_APPLE": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_CHERRY": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_CORSAIR": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_GENERIC": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LENOVO": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LOGITECH": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LOGITECH_DJ": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_LOGITECH_HIDPP": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_MICROSOFT": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HID_ROCCAT": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "INET": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "IP_MULTICAST": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "LEDS_CLASS": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "LEDS_CLASS_MULTICOLOR": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "MD": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MEMCG": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MEMCG_V1": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MMC": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "MMC_BLOCK": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "MODULES": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NET": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NETDEVICES": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NET_9P": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "NET_9P_VIRTIO": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "NEW_LEDS": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "OVERLAY_FS": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
     "PATA_MARVELL": {
       "tristate": "m",
+      "src": "User"
+    },
+    "PCI": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "PM_AUTOSLEEP": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "RD_ZSTD": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "RPMB": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "RT_GROUP_SCHED": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "SATA_AHCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "SERIAL_8250": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "SERIAL_8250_CONSOLE": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "SMP": {
+      "tristate": "y",
       "src": "User"
     },
     "SQUASHFS": {
       "tristate": "m",
       "src": "FromConfig"
+    },
+    "SYSVIPC": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "TMPFS": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "TMPFS_POSIX_ACL": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "TMPFS_XATTR": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "UNIX": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "USB": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "USB_EHCI_HCD": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "USB_EHCI_PCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "USB_HID": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "USB_OHCI_HCD": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "USB_OHCI_HCD_PCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VHOST_NET": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VIRTIO_BALLOON": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VIRTIO_BLK": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VIRTIO_CONSOLE": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "VIRTIO_DEBUG": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "VIRTIO_INPUT": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VIRTIO_IOMMU": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VIRTIO_NET": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VIRTIO_PCI": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "WQ_POWER_EFFICIENT_DEFAULT": {
+      "tristate": "y",
+      "src": "FromConfig"
+    },
+    "XXHASH": {
+      "tristate": "y",
+      "src": "User"
     }
   }
 }
