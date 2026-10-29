@@ -336,6 +336,10 @@
       "tristate": "m",
       "src": "User"
     },
+    "MMC": {
+      "tristate": "y",
+      "src": "User"
+    },
     "MMC_BLOCK": {
       "tristate": "m",
       "src": "User"
