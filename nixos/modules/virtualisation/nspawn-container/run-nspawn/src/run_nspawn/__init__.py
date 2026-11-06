@@ -7,6 +7,7 @@ import os
 import signal
 import subprocess
 import sys
+import tempfile
 import typing
 from pathlib import Path
 
@@ -24,26 +25,45 @@ class Netns:
 
 
 def run_ip(*args: str) -> None:
-    subprocess.run(
-        ["@ip@", *args],
-        check=True,
-    )
+    pass
 
 
 @contextlib.contextmanager
 def mk_netns(name: str) -> typing.Generator[Netns, None, None]:
     logger.info("creating netns %s", name)
-    run_ip("netns", "add", name)
-    try:
-        yield Netns(name=name, path=Path("/run/netns") / name)
-    finally:
-        logger.info("deleting netns %s", name)
-        run_ip("netns", "delete", name)
+    with tempfile.TemporaryDirectory() as dir:
+        filet = Path(dir) / "test"
+        filet.touch()
+        print(filet, filet.exists())
+        with subprocess.Popen(
+            [
+                "@unshare@",
+                "--user",
+                "-r",
+                "--mount",
+                "--net",
+                "--fork",
+                "/bin/sh",
+                "-c",
+                f"source /etc/profile; mount --make-rprivate /; mount --bind /proc/self/ns/net {filet}; exec sleep infinity",
+            ]
+        ) as pp:
+            from time import sleep
+
+            sleep(2)
+            with filet.open("w") as f:
+                f.write(str(pp.pid))
+            try:
+                holder = f"/proc/{pp.pid}/ns/net"
+                yield Netns(name=holder, path=Path(holder))
+            finally:
+                logger.info("deleting netns %s", name)
+                pp.kill()
 
 
 @contextlib.contextmanager
 def vlan_lock(vlan: int) -> typing.Generator[None, None, None]:
-    lockfile = Path(f"/run/nixos-nspawn/vlan-{vlan}.lock")
+    lockfile = Path(f"/run/user/1000/nixos-nspawn/vlan-{vlan}.lock")
     lockfile.parent.mkdir(parents=True, exist_ok=True)
     with lockfile.open("w") as f:
         # Grab an exclusive lock.
@@ -169,15 +189,29 @@ def run(
         level=logging.WARNING,
     )
 
-    assert os.geteuid() == 0, (
-        f"systemd-nspawn requires root to work. You are {os.geteuid()}"
-    )
-
     root_dir = Path(root_dir_str)
 
     root_dir.mkdir(parents=True, exist_ok=True)
     root_dir.chmod(0o755)
     (root_dir / "usr/bin").mkdir(parents=True, exist_ok=True)
+    subprocess.check_call(
+        [
+            "@mkosi-sandbox@",
+            "--debug",
+            "--become-root",
+            "--map-foreign",
+            "--bind",
+            root_dir.absolute(),
+            root_dir.absolute(),
+            "--bind",
+            "/nix",
+            "/nix",
+            "@systemd-dissect@",
+            "--shift",
+            root_dir.absolute(),
+            "foreign",
+        ]
+    )
 
     with (
         mk_netns(f"nixos-nspawn-{container_name}") as netns,
@@ -199,13 +233,16 @@ def run(
             [
                 "@systemd-nspawn@",
                 *nspawn_options,
+                "-E",
+                "SYSTEMD_LOG_LEVEL=debug",
                 f"--directory={root_dir}",
-                f"--network-namespace-path={netns.path}",
-                *(
-                    [f"--bind={shared_dir}:/tmp/shared"]
-                    if shared_dir is not None
-                    else []
-                ),
+                "--quiet",
+                # f"--network-namespace-path={netns.path}",
+                # *(
+                # [f"--bind={shared_dir}:/tmp/shared"]
+                # if shared_dir is not None
+                # else []
+                # ),
                 init,
                 *cmdline,
             ],
@@ -216,6 +253,8 @@ def run(
 
         try:
             exit_code = cp.wait()
+        except Exception as e:
+            print(e)
         finally:
             # If we get interrupted for any reason (most likely a SIGTERM),
             # be sure to kill our child process.
@@ -229,14 +268,15 @@ def run(
             # "Linux file attributes". Please improve this if you run into this!
             #
             # [0]: https://github.com/NixOS/nixpkgs/blob/d1eff395720e1fe15838263642a2bc1dca1eea32/nixos/modules/system/activation/activation-script.nix#L281
-            subprocess.run(
-                [
-                    "@chattr@",
-                    "-i",
-                    root_dir / "var/empty",
-                ],
-                check=True,
-            )
+            if (root_dir / "var/empty").exists():
+                subprocess.run(
+                    [
+                        "@chattr@",
+                        "-i",
+                        root_dir / "var/empty",
+                    ],
+                    check=True,
+                )
 
         sys.exit(exit_code)
 

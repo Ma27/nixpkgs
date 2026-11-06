@@ -95,14 +95,15 @@ in
       # have permission to mount filesystems of type `sysfs` nor `procfs`.
       # Fortunately, the build sandbox does provide a `/proc` and `/sys` that
       # we can just forward onto the container.
-      "--private-users=no"
-      "--bind=/proc:/run/host/proc"
-      "--bind=/sys:/run/host/sys"
+      "--private-users=managed"
+      "--private-users-ownership=foreign"
+      "--forward-journal=/run/user/1000/snens.journal"
+      #"--bind=/proc:/run/host/proc"
+      #"--bind=/sys:/run/host/sys"
 
       # From `man systemd-nspawn`:
       # > Use --keep-unit and --register=no in combination to disable any
       # > kind of unit allocation or registration with systemd-machined.
-      "--keep-unit"
       "--register=no"
 
       # Send a READY=1 notification to a socket when the container is fully booted.

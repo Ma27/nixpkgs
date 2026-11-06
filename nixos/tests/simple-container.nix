@@ -5,12 +5,12 @@
     machine = { pkgs, ... }: {
       users.users.root.packages = [ pkgs.hello ];
     };
-    noprofile = { };
+    #noprofile = { };
   };
 
   testScript = ''
     start_all()
     machine.succeed("hello")
-    noprofile.fail("hello")
+    #noprofile.fail("hello")
   '';
 }

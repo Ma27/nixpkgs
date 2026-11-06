@@ -279,7 +279,7 @@ class QemuStartCommand:
         env = dict(os.environ)
         env.update(
             {
-                "TMPDIR": str(state_dir),
+                "TMPDIR": "/tmp",
                 "SHARED_DIR": str(shared_dir),
                 "USE_TMPDIR": "1",
             }
@@ -1965,8 +1965,33 @@ class NspawnMachine(BaseMachine):
         return (cp.returncode, cp.stdout)
 
     def _stream_journal(self) -> None:
+        """
+        from mkosi.run import sandbox_cmd
+        stuff0 = [
+            "/run/user/1000",
+            "/nix",
+            "/dev",
+            "/proc",
+            "/sys",
+            "/run",
+            "/bin",
+            "/tmp",
+            "/home",
+            "/etc",
+        ]
+        stuff = [("--bind", x, x) for x in stuff0]
+        with sandbox_cmd(
+            options=[
+                "--become-root",
+                "--map-foreign",
+                "--bind",
+                *(arg for triple in stuff for arg in triple),
+            ]
+        ) as _:
+        """
         assert self.process is not None, "Container not started"
-        journal_path = self.state_dir / "var/log/journal"
+        # journal_path = self.state_dir / "var/log/journal"
+        journal_path = Path("/run/user/1000/snens.journal")
 
         # Grab a reference to the process here so we can continue polling
         # the container process to see if it has exited.
@@ -2042,9 +2067,13 @@ class NspawnMachine(BaseMachine):
                 "RUN_NSPAWN_ROOT_DIR": str(self.state_dir),
                 "RUN_NSPAWN_SHARED_DIR": str(self.shared_dir),
                 "NOTIFY_SOCKET": self.machine_sock_path.as_posix(),
+                "SYSTEMD_LOG_LEVEL": "debug",
+                "RUNTIME_DIRECTORY": "/tmp",
+                "XDG_RUNTIME_DIR": "/run/user/1000",
+                "SYSTEMD_NSPAWN_LOCK": "0",
             },
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
         )
 
         self.log(f"systemd-nspawn running (pid {self.process.pid})")

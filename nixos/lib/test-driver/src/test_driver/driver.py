@@ -231,9 +231,6 @@ class Driver:
         return self
 
     def _init_nspawn_environment(self) -> None:
-        assert os.geteuid() == 0, (
-            f"systemd-nspawn requires root to work. You are {os.geteuid()}"
-        )
 
         # set up prerequisites for systemd-nspawn containers.
         # these are not guaranteed to be set up in the Nix sandbox.

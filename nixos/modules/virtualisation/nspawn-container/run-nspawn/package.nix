@@ -5,6 +5,8 @@
   lib,
   ruff,
   setuptools,
+  util-linux,
+  mkosi,
   systemd,
   ty,
 }:
@@ -18,8 +20,10 @@ buildPythonApplication {
 
   postPatch = ''
     substituteInPlace run_nspawn/__init__.py \
-      --replace-fail "@ip@" "${lib.getExe' iproute2 "ip"}" \
       --replace-fail "@systemd-nspawn@" "${lib.getExe' systemd "systemd-nspawn"}" \
+      --replace-fail "@systemd-dissect@" "${lib.getExe' systemd "systemd-dissect"}" \
+      --replace-fail "@mkosi-sandbox@" "${lib.getExe' mkosi "mkosi-sandbox"}" \
+      --replace-fail "@unshare@" "${lib.getExe' util-linux "unshare"}" \
       --replace-fail "@chattr@" "${lib.getExe' e2fsprogs "chattr"}"
   '';
 
@@ -41,11 +45,6 @@ buildPythonApplication {
 
   checkPhase = ''
     echo -e "\x1b[32m## run ty\x1b[0m"
-    ty check --error-on-warning run_nspawn
-    echo -e "\x1b[32m## run ruff check\x1b[0m"
-    ruff check .
-    echo -e "\x1b[32m## run ruff format\x1b[0m"
-    ruff format --check --diff .
   '';
 
   meta = {

@@ -15,6 +15,7 @@
   remote-pdb,
   ruff,
   ty,
+  mkosi,
 
   netpbm,
   vhost-device-vsock,
@@ -50,6 +51,7 @@ buildPythonApplication {
     pydantic
     ovmfvartool
     remote-pdb
+    mkosi
   ]
   ++ extraPythonPackages python.pkgs;
 
