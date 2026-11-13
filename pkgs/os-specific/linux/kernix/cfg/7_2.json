@@ -36,6 +36,10 @@
       "tristate": "y",
       "src": "FromConfig"
     },
+    "BLK_DEV_DM": {
+      "tristate": "m",
+      "src": "User"
+    },
     "BLK_DEV_INITRD": {
       "tristate": "y",
       "src": "FromConfig"
@@ -112,6 +116,14 @@
       "tristate": "y",
       "src": "FromConfig"
     },
+    "DRM": {
+      "tristate": "y",
+      "src": "User"
+    },
+    "DRM_VIRTIO_GPU": {
+      "tristate": "m",
+      "src": "User"
+    },
     "EFI": {
       "tristate": "y",
       "src": "User"
@@ -123,6 +135,10 @@
     "EXT4_FS": {
       "tristate": "m",
       "src": "FromConfig"
+    },
+    "FUSE_FS": {
+      "tristate": "m",
+      "src": "User"
     },
     "HIDRAW": {
       "tristate": "y",
@@ -165,6 +181,10 @@
       "src": "User"
     },
     "HID_ROCCAT": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "HW_RANDOM_VIRTIO": {
       "tristate": "m",
       "src": "User"
     },
@@ -264,6 +284,14 @@
       "tristate": "m",
       "src": "User"
     },
+    "SCSI_VIRTIO": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "SENSORS_PROM21_XHCI": {
+      "tristate": "m",
+      "src": "User"
+    },
     "SERIAL_8250": {
       "tristate": "y",
       "src": "User"
@@ -283,6 +311,18 @@
     "SYSVIPC": {
       "tristate": "y",
       "src": "FromConfig"
+    },
+    "TCG_CRB": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "TCG_TIS": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "TCG_TPM": {
+      "tristate": "m",
+      "src": "User"
     },
     "TMPFS": {
       "tristate": "y",
@@ -324,6 +364,14 @@
       "tristate": "m",
       "src": "User"
     },
+    "USB_UHCI_HCD": {
+      "tristate": "m",
+      "src": "FromConfig"
+    },
+    "USB_XHCI_HCD": {
+      "tristate": "m",
+      "src": "User"
+    },
     "VHOST_NET": {
       "tristate": "m",
       "src": "User"
@@ -344,11 +392,19 @@
       "tristate": "y",
       "src": "User"
     },
+    "VIRTIO_FS": {
+      "tristate": "m",
+      "src": "User"
+    },
     "VIRTIO_INPUT": {
       "tristate": "m",
       "src": "User"
     },
     "VIRTIO_IOMMU": {
+      "tristate": "m",
+      "src": "User"
+    },
+    "VIRTIO_MMIO": {
       "tristate": "m",
       "src": "User"
     },

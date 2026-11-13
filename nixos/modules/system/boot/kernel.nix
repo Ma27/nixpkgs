@@ -328,10 +328,10 @@ in
 
           # Some SATA/PATA stuff.
           "ahci"
-          "sata_nv"
-          "sata_via"
-          "sata_sis"
-          "sata_uli"
+          #"sata_nv"
+          #"sata_via"
+          #"sata_sis"
+          #"sata_uli"
           "ata_piix"
           "pata_marvell"
 
@@ -372,7 +372,7 @@ in
         ]
         ++ optionals pkgs.stdenv.hostPlatform.isx86 [
           # Misc. x86 keyboard stuff.
-          "pcips2"
+          #"pcips2"
           "atkbd"
           "i8042"
         ]
